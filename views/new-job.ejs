@@ -1,60 +1,278 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Create Job</title>
-  <link rel="stylesheet" href="/public/styles.css" />
-</head>
-<body>
+<section class="panel">
+  <h1 style="margin-top:0;">Create Approval Job</h1>
+  <p class="muted">Enter the customer details, upload the mockup, and send the approval link when ready. This is built for a simple Zander Ink flow: create job → send proof → approve or request changes → release to production.</p>
 
-<div class="page">
+  <form action="/jobs" method="post" enctype="multipart/form-data" class="form-grid" autocomplete="off">
+    <div>
+      <label>Job Number</label>
+      <input name="job_number" placeholder="Auto if left blank" autocapitalize="off" spellcheck="false" autocomplete="off" />
+    </div>
 
-  <div class="topbar">
-    <h1>Create New Job</h1>
-    <a class="btn btn-light" href="/">Back</a>
-  </div>
+    <div>
+      <label>Company Name</label>
+      <input name="company_name" />
+    </div>
 
-  <div class="card">
+    <div>
+      <label>Customer Name</label>
+      <input name="customer_name" required />
+    </div>
 
-    <form action="/jobs" method="POST" enctype="multipart/form-data">
+    <div>
+      <label>Customer Email</label>
+      <input type="email" name="customer_email" required autocapitalize="off" spellcheck="false" autocomplete="email" placeholder="customer@email.com" />
+    </div>
 
-      <h2>Customer Info</h2>
-      <div class="form-grid">
-        <input name="customer_name" placeholder="Customer Name" required>
-        <input name="company_name" placeholder="Company Name">
-        <input type="email" name="customer_email" placeholder="Customer Email" required>
+    <div class="full">
+      <label>Garment</label>
+      <div id="garmentRows">
+        <div class="dynamic-row" data-index="0">
+          <select name="garment_0" class="dynamic-select garment-select">
+            <option value="">Select garment</option>
+            <% garmentOptions.forEach(option => { %>
+              <option value="<%= option %>"><%= option %></option>
+            <% }) %>
+            <option value="__custom__">Other / Custom Garment</option>
+          </select>
+          <input name="garment_custom_0" class="dynamic-custom-input" placeholder="Type custom garment" style="display:none;" />
+        </div>
       </div>
+      <button
+        class="btn btn-light btn-small js-add-row"
+        type="button"
+        data-container="garmentRows"
+        data-prefix="garment"
+        data-options='<%- JSON.stringify(garmentOptions) %>'
+        data-placeholder="Select garment"
+        data-custom-placeholder="Type custom garment"
+      >
+        Add Another Garment
+      </button>
+    </div>
 
-      <h2>Garment Info</h2>
-      <div class="form-grid">
-        <input name="garment" placeholder="Garment">
-        <input name="garment_color" placeholder="Garment Color">
-        <input name="print_locations" placeholder="Print Locations (Front, Back, Sleeve)">
-        <input name="imprint_colors" placeholder="Imprint Colors">
+    <div>
+      <label>Garment Color</label>
+      <select name="garment_color" id="garment_color_select">
+        <option value="">Select color</option>
+        <% garmentColorOptions.forEach(color => { %>
+          <option value="<%= color %>"><%= color %></option>
+        <% }) %>
+        <option value="__custom__">Other / Custom Color</option>
+      </select>
+      <input name="garment_color_custom" id="garment_color_custom" placeholder="Type custom garment color" style="margin-top:8px;display:none;" />
+    </div>
+
+    <div>
+      <label>Process</label>
+      <select name="process" id="process_select">
+        <option value="">Select process</option>
+        <% processOptions.forEach(option => { %>
+          <option value="<%= option %>"><%= option %></option>
+        <% }) %>
+        <option value="__custom__">Other / Custom</option>
+      </select>
+      <input name="process_custom" id="process_custom" placeholder="Type custom process" style="margin-top:8px;display:none;" />
+    </div>
+
+    <div class="full">
+      <label>Print Locations</label>
+      <div id="printLocationRows">
+        <div class="dynamic-row" data-index="0">
+          <select name="print_location_0" class="dynamic-select print-location-select">
+            <option value="">Select print location</option>
+            <% printLocationOptions.forEach(option => { %>
+              <option value="<%= option %>"><%= option %></option>
+            <% }) %>
+            <option value="__custom__">Other / Custom</option>
+          </select>
+          <input name="print_location_custom_0" class="dynamic-custom-input" placeholder="Type custom print location" style="display:none;" />
+        </div>
       </div>
+      <button
+        class="btn btn-light btn-small js-add-row"
+        type="button"
+        data-container="printLocationRows"
+        data-prefix="print_location"
+        data-options='<%- JSON.stringify(printLocationOptions) %>'
+        data-placeholder="Select print location"
+        data-custom-placeholder="Type custom print location"
+      >
+        Add Another Location
+      </button>
+    </div>
 
-      <h2>Order Info</h2>
-      <div class="form-grid">
-        <input name="total_sizes" placeholder="Sizes Breakdown">
-        <input name="total_quantity" placeholder="Total Quantity">
-        <input name="total_price" placeholder="Total Price">
+    <div>
+      <label>Color of Imprint(s)</label>
+      <input name="imprint_colors" placeholder="White front / Red back" />
+    </div>
+
+    <div>
+      <label>Total Price</label>
+      <input name="total_price" placeholder="$499.00" />
+    </div>
+
+    <div>
+      <label>Due Date</label>
+      <input type="date" name="due_date" />
+    </div>
+
+    <div>
+      <label>Fulfillment</label>
+      <select name="fulfillment">
+        <option value="">None</option>
+        <option value="Pickup">Pickup</option>
+        <option value="Ship">Ship</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Shipping Method</label>
+      <input name="shipping_method" placeholder="UPS Ground / Customer Pickup" />
+    </div>
+
+    <div>
+      <label>Rush</label>
+      <select name="rush">
+        <option value="no">No</option>
+        <option value="yes">Yes</option>
+      </select>
+    </div>
+
+    <div class="full">
+      <label>Total Sizes</label>
+      <div class="grid-4">
+        <% sizeOrder.forEach(size => { %>
+          <div>
+            <label style="font-size:13px;"><%= size %></label>
+            <input type="number" min="0" name="size_<%= size.toLowerCase() %>" placeholder="0" />
+          </div>
+        <% }) %>
       </div>
+    </div>
 
-      <h2>Mockup</h2>
-      <input type="file" name="mockup">
+    <div>
+      <label>Main Mockup Image</label>
+      <input type="file" name="mockup" accept="image/*,.pdf" />
+    </div>
 
-      <h2>Notes</h2>
-      <textarea name="notes" placeholder="Internal notes or instructions"></textarea>
+    <div>
+      <label>Extra Files</label>
+      <input type="file" name="attachments" multiple />
+    </div>
 
-      <br><br>
-      <button class="btn btn-primary" type="submit">Create Job</button>
+    <div class="full">
+      <label>Internal Notes</label>
+      <textarea name="internal_notes" placeholder="Anything only your team should see"></textarea>
+    </div>
 
-    </form>
+    <div>
+      <label>Send approval email now?</label>
+      <select name="send_now">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+    </div>
 
-  </div>
+    <div class="full">
+      <button class="btn btn-primary" type="submit">Save Job</button>
+    </div>
+  </form>
+</section>
 
-</div>
+<script>
+  function toggleCustom(selectId, inputId) {
+    const select = document.getElementById(selectId);
+    const input = document.getElementById(inputId);
+    if (!select || !input) return;
+    const sync = () => {
+      const show = select.value === '__custom__';
+      input.style.display = show ? 'block' : 'none';
+      if (!show) input.value = '';
+    };
+    select.addEventListener('change', sync);
+    sync();
+  }
 
-</body>
-</html>
+  function wireDynamicCustom(row) {
+    const select = row.querySelector('select');
+    const input = row.querySelector('.dynamic-custom-input');
+    if (!select || !input) return;
+    const sync = () => {
+      const show = select.value === '__custom__';
+      input.style.display = show ? 'block' : 'none';
+      if (!show) input.value = '';
+    };
+    select.addEventListener('change', sync);
+    sync();
+  }
+
+  function addDynamicRow(containerId, prefix, options, placeholder, customPlaceholder, selectedValue = '', selectedCustom = '') {
+    const container = document.getElementById(containerId);
+    const index = container.querySelectorAll('.dynamic-row').length;
+    const row = document.createElement('div');
+    row.className = 'dynamic-row';
+    row.dataset.index = index;
+
+    const select = document.createElement('select');
+    select.name = `${prefix}_${index}`;
+    select.className = 'dynamic-select';
+
+    const first = document.createElement('option');
+    first.value = '';
+    first.textContent = placeholder;
+    select.appendChild(first);
+
+    options.forEach(option => {
+      const el = document.createElement('option');
+      el.value = option;
+      el.textContent = option;
+      if (selectedValue === option) el.selected = true;
+      select.appendChild(el);
+    });
+
+    const customOption = document.createElement('option');
+    customOption.value = '__custom__';
+    customOption.textContent = prefix === 'garment' ? 'Other / Custom Garment' : 'Other / Custom';
+    if ((selectedValue && !options.includes(selectedValue)) || selectedValue === '__custom__') customOption.selected = true;
+    select.appendChild(customOption);
+
+    const input = document.createElement('input');
+    input.name = `${prefix}_custom_${index}`;
+    input.className = 'dynamic-custom-input';
+    input.placeholder = customPlaceholder;
+    input.value = selectedCustom || ((selectedValue && !options.includes(selectedValue)) ? selectedValue : '');
+    input.style.display = (input.value || selectedValue === '__custom__') ? 'block' : 'none';
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'btn btn-light btn-small';
+    remove.textContent = 'Remove';
+    remove.onclick = () => row.remove();
+
+    row.appendChild(select);
+    row.appendChild(input);
+    row.appendChild(remove);
+    container.appendChild(row);
+    wireDynamicCustom(row);
+  }
+
+  toggleCustom('garment_color_select', 'garment_color_custom');
+  toggleCustom('process_select', 'process_custom');
+  document.querySelectorAll('.dynamic-row').forEach(wireDynamicCustom);
+
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.js-add-row').forEach(button => {
+      button.addEventListener('click', () => {
+        let options = [];
+        try { options = JSON.parse(button.dataset.options || '[]'); } catch (e) { options = []; }
+        addDynamicRow(
+          button.dataset.container,
+          button.dataset.prefix,
+          options,
+          button.dataset.placeholder,
+          button.dataset.customPlaceholder
+        );
+      });
+    });
+  });
+</script>
