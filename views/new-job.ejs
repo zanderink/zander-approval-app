@@ -3,40 +3,58 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Job</title>
+  <title>Create Job</title>
   <link rel="stylesheet" href="/public/styles.css" />
 </head>
 <body>
-  <div class="page">
-    <div class="topbar">
-      <h1>Create New Job</h1>
-      <a class="btn btn-light" href="/">Back to Dashboard</a>
-    </div>
 
-    <div class="card">
-      <form action="/jobs" method="POST" enctype="multipart/form-data" class="form-grid">
+<div class="page">
+
+  <div class="topbar">
+    <h1>Create New Job</h1>
+    <a class="btn btn-light" href="/">Back</a>
+  </div>
+
+  <div class="card">
+
+    <form action="/jobs" method="POST" enctype="multipart/form-data">
+
+      <h2>Customer Info</h2>
+      <div class="form-grid">
         <input name="customer_name" placeholder="Customer Name" required>
         <input name="company_name" placeholder="Company Name">
         <input type="email" name="customer_email" placeholder="Customer Email" required>
+      </div>
+
+      <h2>Garment Info</h2>
+      <div class="form-grid">
         <input name="garment" placeholder="Garment">
         <input name="garment_color" placeholder="Garment Color">
+        <input name="print_locations" placeholder="Print Locations (Front, Back, Sleeve)">
         <input name="imprint_colors" placeholder="Imprint Colors">
-        <input name="print_locations" placeholder="Print Locations">
+      </div>
+
+      <h2>Order Info</h2>
+      <div class="form-grid">
         <input name="total_sizes" placeholder="Sizes Breakdown">
         <input name="total_quantity" placeholder="Total Quantity">
         <input name="total_price" placeholder="Total Price">
-        <textarea name="notes" placeholder="Notes / internal notes"></textarea>
+      </div>
 
-        <div>
-          <label>Upload Mockup</label>
-          <input type="file" name="mockup">
-        </div>
+      <h2>Mockup</h2>
+      <input type="file" name="mockup">
 
-        <div class="full-row">
-          <button type="submit" class="btn btn-primary">Create Job</button>
-        </div>
-      </form>
-    </div>
+      <h2>Notes</h2>
+      <textarea name="notes" placeholder="Internal notes or instructions"></textarea>
+
+      <br><br>
+      <button class="btn btn-primary" type="submit">Create Job</button>
+
+    </form>
+
   </div>
+
+</div>
+
 </body>
 </html>
