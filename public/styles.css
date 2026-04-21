@@ -8,7 +8,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .login-inner {
@@ -20,11 +20,23 @@ body {
   text-align: center;
 }
 
+input {
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
 button {
   background: #cf1124;
   color: white;
   border: none;
   width: 100%;
+  padding: 12px;
   cursor: pointer;
   font-weight: bold;
+  border-radius: 6px;
+}
+
+button:hover {
+  opacity: 0.9;
 }
