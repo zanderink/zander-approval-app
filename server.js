@@ -95,7 +95,34 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/jobs/new', requireLogin, (req, res) => {
-  res.render('new-job');
+  res.render('new-job', {
+    garmentOptions: ['Shirt', 'Long Sleeve', 'Hoodie', 'Jacket', 'Polo', '1/4 Zip'],
+    garmentColorOptions: [
+      'Black',
+      'White',
+      'Sport Grey',
+      'Dark Heather',
+      'Red',
+      'Maroon',
+      'Royal',
+      'Navy',
+      'Carolina Blue',
+      'Forest Green',
+      'Orange',
+      'Purple',
+      'Gold',
+      'Sand'
+    ],
+    processOptions: ['Screen Print', 'Embroidery', 'Direct to Film'],
+    printLocationOptions: [
+      'Front Left Chest',
+      'Front Left Chest / Back',
+      'Full Front',
+      'Full Front / Full Back',
+      'Sleeve'
+    ],
+    sizeOrder: ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL']
+  });
 });
 
 app.post('/jobs', requireLogin, upload.single('mockup'), (req, res) => {
