@@ -1,25 +1,60 @@
-<div class="center-shell">
-  <div class="login-box">
-    <div class="customer-head hero-brand-panel">
-      <img src="/zander-mark.svg" alt="<%= shopName %>" class="hero-logo" />
-      <h1><%= shopName %> Admin</h1>
-      <div>Log in to manage approvals, revisions, and production release.</div>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Detail</title>
+  <link rel="stylesheet" href="/public/styles.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <h1><%= job.customer_name || 'Job Detail' %></h1>
+      <a class="btn btn-light" href="/">Back to Dashboard</a>
     </div>
-    <div class="login-inner">
-      <% if (error) { %><div class="flash-error"><%= error %></div><% } %>
-      <form action="/login" method="post" class="grid-2">
-        <div>
-          <label>Username</label>
-          <input type="text" name="username" required />
-        </div>
-        <div>
-          <label>Password</label>
-          <input type="password" name="password" required />
-        </div>
-        <div style="grid-column:1/-1;">
-          <button class="btn btn-primary" type="submit">Log In</button>
-        </div>
+
+    <% if (job.approval_status === 'APPROVED') { %>
+      <div class="big-banner approved">APPROVED</div>
+    <% } else if (job.approval_status === 'REQUEST CHANGES') { %>
+      <div class="big-banner changes">
+        REQUEST CHANGES
+        <% if (job.customer_notes) { %>
+          <div class="banner-notes"><%= job.customer_notes %></div>
+        <% } %>
+      </div>
+    <% } %>
+
+    <div class="detail-grid">
+      <div class="card">
+        <h2>Job Info</h2>
+        <p><strong>Company:</strong> <%= job.company_name || '-' %></p>
+        <p><strong>Email:</strong> <%= job.customer_email || '-' %></p>
+        <p><strong>Garment:</strong> <%= job.garment || '-' %></p>
+        <p><strong>Garment Color:</strong> <%= job.garment_color || '-' %></p>
+        <p><strong>Print Locations:</strong> <%= job.print_locations || '-' %></p>
+        <p><strong>Imprint Colors:</strong> <%= job.imprint_colors || '-' %></p>
+        <p><strong>Total Sizes:</strong> <%= job.total_sizes || '-' %></p>
+        <p><strong>Total Quantity:</strong> <%= job.total_quantity || '-' %></p>
+        <p><strong>Total Price:</strong> <%= job.total_price || '-' %></p>
+        <p><strong>Status:</strong> <%= job.status || '-' %></p>
+      </div>
+
+      <div class="card">
+        <h2>Mockup</h2>
+        <% if (job.mockup) { %>
+          <img src="<%= job.mockup %>" class="mockup-image" alt="Mockup">
+        <% } else { %>
+          <p>No mockup uploaded.</p>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Actions</h2>
+      <form method="POST" action="/jobs/<%= job.id %>/send-approval">
+        <button type="submit" class="btn btn-primary">Send / Resend Approval</button>
       </form>
     </div>
   </div>
-</div>
+</body>
+</html>
