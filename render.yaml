@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="center-shell" style="background:#f5f6f8;display:block;min-height:auto;">
+    <div class="customer-box" style="margin:28px auto;">
+      <div class="customer-head hero-brand-panel">
+        <img src="/zander-mark.svg" alt="<%= shopName %>" class="hero-logo" />
+        <h1>Thank You</h1>
+        <div>Your response was saved.</div>
+      </div>
+      <div class="customer-inner">
+        <% const approved = job.approval_status === 'Approved'; %>
+        <div class="flash-success"><strong><%= approved ? 'Approved' : 'Changes Requested' %></strong> for job <%= job.job_number %>.</div>
+        <p><%= approved ? 'Your order has been released to production.' : 'Your requested changes were sent to the shop.' %></p>
+        <div class="kv">
+          <div><strong>Garment</strong></div><div><%= job.garment || '—' %></div>
+          <div><strong>Total Price</strong></div><div><%= job.total_price || '—' %></div>
+          <div><strong>Your Notes</strong></div><div style="white-space:pre-line;"><%= job.customer_notes || '—' %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

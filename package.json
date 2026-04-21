@@ -1,0 +1,141 @@
+<section class="toolbar">
+  <div>
+    <h1 style="margin:0 0 6px;"><%= job.job_number %></h1>
+    <div class="tag-row">
+      <span class="badge <%= badgeClass(job.approval_status) %>"><%= job.approval_status %></span>
+      <span class="badge <%= badgeClass(job.production_stage) %>"><%= job.production_stage %></span>
+      <% if (job.rush) { %><span class="pill rush">Rush</span><% } %>
+      <% if (job.tags && job.tags.pickup) { %><span class="pill pickup">Pickup</span><% } %>
+      <% if (job.tags && job.tags.ship) { %><span class="pill ship">Ship</span><% } %>
+    </div>
+  </div>
+  <div class="tag-row">
+    <a class="btn btn-light btn-small" href="/jobs/<%= job.id %>/edit">Edit Job</a>
+    <a class="btn btn-light btn-small" href="/jobs/<%= job.id %>/print" target="_blank">Print Production Sheet</a>
+    <form action="/jobs/<%= job.id %>/duplicate" method="post" style="margin:0;"><button class="btn btn-light btn-small" type="submit">Duplicate Job</button></form>
+  </div>
+</section>
+
+<section class="approval-callout <%= (job.approval_status === 'Approved') ? 'ok' : (job.approval_status === 'Changes Requested' ? 'changes' : 'neutral') %>">
+  <% if (job.approval_status === 'Approved') { %>
+    <div class="approval-callout-title">APPROVED</div>
+    <div class="approval-callout-body">Customer approved this mockup on <%= formatDate(job.customer_responded_at || job.approved_at) %>.</div>
+  <% } else if (job.approval_status === 'Changes Requested') { %>
+    <div class="approval-callout-title">REQUEST CHANGES</div>
+    <div class="approval-callout-body" style="white-space:pre-line;"><%= job.customer_requested_changes || job.customer_notes || 'Customer requested changes.' %></div>
+  <% } else { %>
+    <div class="approval-callout-title">WAITING FOR CUSTOMER RESPONSE</div>
+    <div class="approval-callout-body">Once the customer approves or requests changes, it will show here.</div>
+  <% } %>
+</section>
+
+<section class="hero">
+  <div class="mockup">
+    <div class="toolbar"><h2 style="margin:0;">Current Mockup</h2><a class="btn btn-light btn-small" href="/approve/<%= job.approval_token %>" target="_blank">Open Customer Page</a></div>
+    <% if (job.mockup_revisions && job.mockup_revisions.length) { %>
+      <img src="/uploads/<%= job.mockup_revisions[0].filename %>" alt="Mockup" />
+      <div class="muted" style="margin-top:10px;">Version <%= job.mockup_revisions[0].version %> uploaded <%= formatDate(job.mockup_revisions[0].uploaded_at) %></div>
+    <% } else { %>
+      <div class="note">No mockup uploaded yet.</div>
+    <% } %>
+  </div>
+  <div class="panel">
+    <h2 style="margin-top:0;">Quick Actions</h2>
+    <div class="button-row" style="margin-bottom:16px;">
+      <form action="/jobs/<%= job.id %>/resend" method="post"><button class="btn btn-blue btn-small" type="submit">Send / Resend Approval</button></form>
+      <form action="/jobs/<%= job.id %>/quick-status" method="post"><input type="hidden" name="action" value="ready"><button class="btn btn-yellow btn-small" type="submit">Ready for Production</button></form>
+      <form action="/jobs/<%= job.id %>/quick-status" method="post"><input type="hidden" name="action" value="production"><button class="btn btn-purple btn-small" type="submit">In Production</button></form>
+      <form action="/jobs/<%= job.id %>/quick-status" method="post"><input type="hidden" name="action" value="completed"><button class="btn btn-green btn-small" type="submit">Completed</button></form>
+      <form action="/jobs/<%= job.id %>/quick-status" method="post"><input type="hidden" name="action" value="delivered"><button class="btn btn-light btn-small" type="submit">Delivered / Picked Up</button></form>
+    </div>
+    <div class="kv">
+      <div><strong>Customer</strong></div><div><%= job.customer_name || '—' %></div>
+      <div><strong>Company</strong></div><div><%= job.company_name || '—' %></div>
+      <div><strong>Email</strong></div><div><%= job.customer_email || '—' %></div>
+      <div><strong>Garment</strong></div><div><%= (job.garments && job.garments.length) ? job.garments.join(', ') : (job.garment || '—') %></div>
+      <div><strong>Garment Color</strong></div><div><%= job.garment_color || '—' %></div>
+      <div><strong>Process</strong></div><div><%= job.process || '—' %></div>
+      <div><strong>Print Locations</strong></div><div><%= (job.print_location_list && job.print_location_list.length) ? job.print_location_list.join(', ') : (job.print_locations || '—') %></div>
+      <div><strong>Imprint Colors</strong></div><div><%= job.imprint_colors || '—' %></div>
+      <div><strong>Total Sizes</strong></div><div style="white-space:pre-line;"><%= job.total_sizes || '—' %></div>
+      <div><strong>Total Quantity</strong></div><div><%= job.total_quantity || '—' %></div>
+      <div><strong>Total Price</strong></div><div><%= job.total_price || '—' %></div>
+      <div><strong>Due Date</strong></div><div><%= job.due_date || '—' %></div>
+      <div><strong>Shipping Method</strong></div><div><%= job.shipping_method || '—' %></div>
+      <div><strong>Internal Notes</strong></div><div style="white-space:pre-line;"><%= job.internal_notes || '—' %></div>
+      <div><strong>Customer Notes</strong></div><div style="white-space:pre-line;"><%= job.customer_notes || '—' %></div>
+      <div><strong>Requested Changes</strong></div><div style="white-space:pre-line;"><%= job.customer_requested_changes || '—' %></div>
+      <div><strong>Approval Email Sent</strong></div><div><%= formatDate(job.approval_email_sent_at) %></div>
+      <div><strong>Viewed</strong></div><div><%= formatDate(job.customer_viewed_at) %></div>
+      <div><strong>Responded</strong></div><div><%= formatDate(job.customer_responded_at) %></div>
+    </div>
+  </div>
+</section>
+
+<section class="split" style="margin-top:18px;">
+  <div class="panel">
+    <div class="toolbar"><h2 style="margin:0;">Mockup Revisions</h2></div>
+    <form action="/jobs/<%= job.id %>/add-revision" method="post" enctype="multipart/form-data" class="grid-2" style="margin-bottom:16px;">
+      <div><label>Add New Revision</label><input type="file" name="mockup" accept="image/*,.pdf" required /></div>
+      <div style="align-self:end;"><button class="btn btn-primary" type="submit">Upload Revision</button></div>
+    </form>
+    <div class="timeline">
+      <% if (!job.mockup_revisions || !job.mockup_revisions.length) { %>
+        <div class="muted">No revisions yet.</div>
+      <% } %>
+      <% (job.mockup_revisions || []).forEach(rev => { %>
+        <div class="revision-thumb">
+          <% if ((rev.original_name || '').match(/\.(png|jpg|jpeg|gif|webp)$/i)) { %>
+            <img src="/uploads/<%= rev.filename %>" alt="Revision" />
+          <% } else { %>
+            <div class="card" style="height:90px;display:grid;place-items:center;">FILE</div>
+          <% } %>
+          <div>
+            <strong>Version <%= rev.version %></strong><br>
+            <span class="muted"><%= rev.original_name %></span><br>
+            <span class="muted"><%= formatDate(rev.uploaded_at) %></span>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar"><h2 style="margin:0;">Files + History</h2></div>
+    <form action="/jobs/<%= job.id %>/add-files" method="post" enctype="multipart/form-data" class="grid-2" style="margin-bottom:16px;">
+      <div>
+        <label>File Type</label>
+        <input name="kind" placeholder="Customer Art / Print Ready / Invoice / General File" />
+      </div>
+      <div>
+        <label>Upload Files</label>
+        <input type="file" name="attachments" multiple required />
+      </div>
+      <div style="grid-column:1/-1;"><button class="btn btn-primary" type="submit">Add Files</button></div>
+    </form>
+
+    <h3>Stored Files</h3>
+    <div class="timeline" style="margin-bottom:18px;">
+      <% if (!job.attachments || !job.attachments.length) { %>
+        <div class="muted">No extra files uploaded.</div>
+      <% } %>
+      <% (job.attachments || []).forEach(file => { %>
+        <div class="timeline-item">
+          <strong><%= file.kind || 'File' %></strong><br>
+          <a href="/uploads/<%= file.filename %>" target="_blank"><%= file.original_name %></a><br>
+          <span class="muted"><%= formatDate(file.uploaded_at) %></span>
+        </div>
+      <% }) %>
+    </div>
+
+    <h3>Approval History</h3>
+    <div class="timeline">
+      <% (job.history || []).forEach(item => { %>
+        <div class="timeline-item">
+          <strong><%= item.message %></strong><br>
+          <span class="muted"><%= formatDate(item.at) %></span>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>

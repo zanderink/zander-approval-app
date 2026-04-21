@@ -1,0 +1,69 @@
+<section class="toolbar">
+  <div>
+    <h1 style="margin:0 0 4px;">Production Board</h1>
+    <div class="muted">See every job in the workflow at a glance.</div>
+  </div>
+  <div class="tag-row">
+    <a class="btn btn-light btn-small" href="/?view=list">List View</a>
+    <a class="btn btn-primary btn-small" href="/jobs/new">+ New Job</a>
+  </div>
+</section>
+
+<form method="get" action="/" class="panel filters" style="margin-bottom:18px;">
+  <div>
+    <label>Search</label>
+    <input name="q" value="<%= filters.q %>" placeholder="Customer, company, job number, garment..." />
+  </div>
+  <div>
+    <label>Approval</label>
+    <select name="approval">
+      <option value="">All</option>
+      <% approvalStatuses.forEach(status => { %><option value="<%= status %>" <%= filters.approval===status ? 'selected' : '' %>><%= status %></option><% }) %>
+    </select>
+  </div>
+  <div>
+    <label>Production</label>
+    <select name="stage">
+      <option value="">All</option>
+      <% productionStages.forEach(stage => { %><option value="<%= stage %>" <%= filters.stage===stage ? 'selected' : '' %>><%= stage %></option><% }) %>
+    </select>
+  </div>
+  <div>
+    <label>Rush</label>
+    <select name="rush">
+      <option value="">All</option>
+      <option value="yes" <%= filters.rush==='yes' ? 'selected' : '' %>>Rush only</option>
+    </select>
+  </div>
+  <div class="tag-row">
+    <input type="hidden" name="view" value="board" />
+    <button class="btn btn-primary" type="submit">Filter</button>
+  </div>
+</form>
+
+<section class="board">
+  <% Object.keys(columns).forEach(column => { %>
+    <div class="board-col">
+      <h3><%= column %> <span class="muted">(<%= columns[column].length %>)</span></h3>
+      <% columns[column].forEach(job => { %>
+        <div class="job-mini">
+          <strong><%= job.job_number %></strong>
+          <div><%= job.customer_name || '—' %></div>
+          <div class="muted" style="font-size:14px;margin:6px 0;"><%= job.garment || '—' %></div>
+          <div class="tag-row" style="margin-bottom:8px;">
+            <span class="badge <%= badgeClass(job.approval_status) %>"><%= job.approval_status %></span>
+            <span class="badge <%= badgeClass(job.production_stage) %>"><%= job.production_stage %></span>
+          </div>
+          <div class="tag-row">
+            <% if (job.rush) { %><span class="pill rush">Rush</span><% } %>
+            <% if (job.tags && job.tags.pickup) { %><span class="pill pickup">Pickup</span><% } %>
+            <% if (job.tags && job.tags.ship) { %><span class="pill ship">Ship</span><% } %>
+          </div>
+          <div class="muted" style="font-size:13px;margin-top:8px;">Due: <%= job.due_date || '—' %></div>
+          <div style="margin-top:10px;"><a class="btn btn-light btn-small" href="/jobs/<%= job.id %>">Open</a></div>
+        </div>
+      <% }) %>
+      <% if (!columns[column].length) { %><div class="muted">No jobs here.</div><% } %>
+    </div>
+  <% }) %>
+</section>

@@ -1,0 +1,25 @@
+<div class="center-shell">
+  <div class="login-box">
+    <div class="customer-head hero-brand-panel">
+      <img src="/zander-mark.svg" alt="<%= shopName %>" class="hero-logo" />
+      <h1><%= shopName %> Admin</h1>
+      <div>Log in to manage approvals, revisions, and production release.</div>
+    </div>
+    <div class="login-inner">
+      <% if (error) { %><div class="flash-error"><%= error %></div><% } %>
+      <form action="/login" method="post" class="grid-2">
+        <div>
+          <label>Username</label>
+          <input type="text" name="username" required />
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" name="password" required />
+        </div>
+        <div style="grid-column:1/-1;">
+          <button class="btn btn-primary" type="submit">Log In</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

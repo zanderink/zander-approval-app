@@ -1,0 +1,104 @@
+<section class="cards">
+  <div class="card"><div class="muted">All Jobs</div><div class="stat"><%= counts.total %></div></div>
+  <div class="card"><div class="muted">Waiting on Approval</div><div class="stat"><%= counts.pending %></div></div>
+  <div class="card"><div class="muted">Approved</div><div class="stat"><%= counts.approved %></div></div>
+  <div class="card"><div class="muted">Changes Needed</div><div class="stat"><%= counts.changes %></div></div>
+  <div class="card"><div class="muted">Ready for Production</div><div class="stat"><%= counts.ready %></div></div>
+  <div class="card"><div class="muted">In Production</div><div class="stat"><%= counts.inProduction %></div></div>
+  <div class="card"><div class="muted">Completed</div><div class="stat"><%= counts.completed %></div></div>
+  <div class="card"><div class="muted">Rush Jobs</div><div class="stat"><%= counts.rush %></div></div>
+</section>
+
+<section class="panel">
+  <div class="toolbar">
+    <div>
+      <h1 style="margin:0 0 4px;">Zander Ink Dashboard</h1>
+      <div class="muted">Search jobs, filter statuses, and release approved work into production fast.</div>
+      <div class="muted" style="margin-top:6px;">For daily use on your phone, open the live link in Safari and tap Share → Add to Home Screen.</div>
+    </div>
+    <div class="tag-row">
+      <a class="btn btn-light btn-small" href="/?view=board">Board View</a>
+      <a class="btn btn-primary btn-small" href="/jobs/new">+ New Job</a>
+    </div>
+  </div>
+
+  <form method="get" action="/" class="filters" style="margin-bottom:16px;">
+    <div>
+      <label>Search</label>
+      <input name="q" value="<%= filters.q %>" placeholder="Customer, company, job number, garment..." />
+    </div>
+    <div>
+      <label>Approval</label>
+      <select name="approval">
+        <option value="">All</option>
+        <% approvalStatuses.forEach(status => { %>
+          <option value="<%= status %>" <%= filters.approval===status ? 'selected' : '' %>><%= status %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label>Production</label>
+      <select name="stage">
+        <option value="">All</option>
+        <% productionStages.forEach(stage => { %>
+          <option value="<%= stage %>" <%= filters.stage===stage ? 'selected' : '' %>><%= stage %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div>
+      <label>Rush</label>
+      <select name="rush">
+        <option value="">All</option>
+        <option value="yes" <%= filters.rush==='yes' ? 'selected' : '' %>>Rush only</option>
+      </select>
+    </div>
+    <div class="tag-row">
+      <input type="hidden" name="view" value="list" />
+      <button class="btn btn-primary" type="submit">Filter</button>
+    </div>
+  </form>
+
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Job</th>
+          <th>Customer</th>
+          <th>Garment</th>
+          <th>Qty</th>
+          <th>Approval</th>
+          <th>Production</th>
+          <th>Due</th>
+          <th>Updated</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      <% if (!jobs.length) { %>
+        <tr><td colspan="9" class="muted">No jobs found.</td></tr>
+      <% } %>
+      <% jobs.forEach(job => { %>
+        <tr>
+          <td>
+            <strong><%= job.job_number %></strong><br>
+            <span class="muted"><%= job.company_name || job.customer_email || '—' %></span>
+            <div class="tag-row" style="margin-top:6px;">
+              <% if (job.rush) { %><span class="pill rush">Rush</span><% } %>
+              <% if (job.tags && job.tags.pickup) { %><span class="pill pickup">Pickup</span><% } %>
+              <% if (job.tags && job.tags.ship) { %><span class="pill ship">Ship</span><% } %>
+            </div>
+          </td>
+          <td><%= job.customer_name || '—' %></td>
+          <td><%= job.garment || '—' %><br><span class="muted"><%= job.garment_color || '' %></span></td>
+          <td><%= job.total_quantity || '—' %></td>
+          <td><span class="badge <%= badgeClass(job.approval_status) %>"><%= job.approval_status %></span></td>
+          <td><span class="badge <%= badgeClass(job.production_stage) %>"><%= job.production_stage %></span></td>
+          <td><%= job.due_date || '—' %></td>
+          <td><%= formatDate(job.updated_at) %></td>
+          <td><a class="btn btn-light btn-small" href="/jobs/<%= job.id %>">Open</a></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
