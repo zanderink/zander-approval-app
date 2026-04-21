@@ -7,41 +7,37 @@
   <link rel="stylesheet" href="/public/styles.css" />
 </head>
 <body>
-  <div style="padding:40px;">
-    <h1>Zander Ink Dashboard</h1>
-
-<div style="margin:20px 0;">
-  <a href="/new-job" style="
-    background:#cf1124;
-    color:white;
-    padding:12px 18px;
-    text-decoration:none;
-    border-radius:6px;
-    font-weight:bold;
-  ">
-    + Create New Job
-  </a>
-</div>
-    <p>You are logged in.</p>
-
-    <div style="margin:20px 0;">
-      <a href="/login">Back to Login</a>
+  <div class="page">
+    <div class="topbar">
+      <h1>Zander Ink Dashboard</h1>
+      <div class="top-actions">
+        <a class="btn btn-primary" href="/jobs/new">+ Create New Job</a>
+        <a class="btn btn-light" href="/logout">Log Out</a>
+      </div>
     </div>
 
-    <h2>Jobs</h2>
-
     <% if (!jobs || jobs.length === 0) { %>
-      <p>No jobs yet.</p>
+      <div class="card">
+        <h2>No jobs yet</h2>
+        <p>Create your first approval job.</p>
+      </div>
     <% } else { %>
-      <ul>
+      <div class="job-grid">
         <% jobs.forEach(job => { %>
-          <li style="margin-bottom:10px;">
-            <strong><%= job.customer_name || 'No customer name' %></strong>
-            <% if (job.company_name) { %> - <%= job.company_name %><% } %>
-            <% if (job.status) { %> - <%= job.status %><% } %>
-          </li>
+          <a class="job-card" href="/jobs/<%= job.id %>">
+            <div class="job-card-top">
+              <strong><%= job.customer_name || 'No customer' %></strong>
+              <span class="status-pill"><%= job.status || 'Draft' %></span>
+            </div>
+            <div><%= job.company_name || '' %></div>
+            <div><%= job.garment || '' %></div>
+            <div><%= job.total_quantity || '' %> pcs</div>
+            <div class="approval-tag <%= (job.approval_status || '').toLowerCase().replace(/\s+/g,'-') %>">
+              <%= job.approval_status || 'Waiting' %>
+            </div>
+          </a>
         <% }) %>
-      </ul>
+      </div>
     <% } %>
   </div>
 </body>
