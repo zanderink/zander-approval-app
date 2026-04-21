@@ -1,7 +1,35 @@
-<svg width="280" height="72" viewBox="0 0 280 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="280" height="72" rx="18" fill="#111111"/>
-  <path d="M26 18H95V27L46 55H96V64H23V55L72 27H26V18Z" fill="#ffffff"/>
-  <path d="M113 20H127L148 52L169 20H183V62H171V38L151 62H145L125 38V62H113V20Z" fill="#CF1124"/>
-  <path d="M193 20H242V30H205V37H239V47H205V52H243V62H193V20Z" fill="#ffffff"/>
-  <path d="M249 20H261V62H249V20Z" fill="#CF1124"/>
-</svg>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zander Ink Dashboard</title>
+  <link rel="stylesheet" href="/public/styles.css" />
+</head>
+<body>
+  <div style="padding:40px;">
+    <h1>Zander Ink Dashboard</h1>
+    <p>You are logged in.</p>
+
+    <div style="margin:20px 0;">
+      <a href="/login">Back to Login</a>
+    </div>
+
+    <h2>Jobs</h2>
+
+    <% if (!jobs || jobs.length === 0) { %>
+      <p>No jobs yet.</p>
+    <% } else { %>
+      <ul>
+        <% jobs.forEach(job => { %>
+          <li style="margin-bottom:10px;">
+            <strong><%= job.customer_name || 'No customer name' %></strong>
+            <% if (job.company_name) { %> - <%= job.company_name %><% } %>
+            <% if (job.status) { %> - <%= job.status %><% } %>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+</body>
+</html>
