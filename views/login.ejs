@@ -2,26 +2,42 @@
 <html>
 <head>
   <title>Zander Ink Login</title>
-  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="stylesheet" href="/styles.css">
 </head>
+
 <body>
   <div class="login-box">
     <div class="login-inner">
-      <div class="brand-logo">
-        <img src="/public/zander-logo.png" alt="Zander Ink" style="max-width:280px;height:auto;">
-      </div>
 
-      <h1>Login</h1>
+      <h1>Zander Ink</h1>
+      <p>Login</p>
 
       <form method="POST" action="/login">
+
         <div style="margin-bottom:12px;">
-          <input type="text" name="username" placeholder="Username" required style="width:100%;padding:12px;">
+          <input 
+            type="text" 
+            name="username" 
+            placeholder="Username" 
+            required 
+            style="width:100%; padding:12px;"
+          >
         </div>
+
         <div style="margin-bottom:12px;">
-          <input type="password" name="password" placeholder="Password" required style="width:100%;padding:12px;">
+          <input 
+            type="password" 
+            name="password" 
+            placeholder="Password" 
+            required 
+            style="width:100%; padding:12px;"
+          >
         </div>
-        <button type="submit" style="padding:12px 18px;">Login</button>
+
+        <button type="submit">Login</button>
+
       </form>
+
     </div>
   </div>
 </body>
