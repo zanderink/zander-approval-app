@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New Job</title>
+  <link rel="stylesheet" href="/public/styles.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <h1>Create New Job</h1>
+      <a class="btn btn-light" href="/">Back to Dashboard</a>
+    </div>
+
+    <div class="card">
+      <form action="/jobs" method="POST" enctype="multipart/form-data" class="form-grid">
+        <input name="customer_name" placeholder="Customer Name" required>
+        <input name="company_name" placeholder="Company Name">
+        <input type="email" name="customer_email" placeholder="Customer Email" required>
+        <input name="garment" placeholder="Garment">
+        <input name="garment_color" placeholder="Garment Color">
+        <input name="imprint_colors" placeholder="Imprint Colors">
+        <input name="print_locations" placeholder="Print Locations">
+        <input name="total_sizes" placeholder="Sizes Breakdown">
+        <input name="total_quantity" placeholder="Total Quantity">
+        <input name="total_price" placeholder="Total Price">
+        <textarea name="notes" placeholder="Notes / internal notes"></textarea>
+
+        <div>
+          <label>Upload Mockup</label>
+          <input type="file" name="mockup">
+        </div>
+
+        <div class="full-row">
+          <button type="submit" class="btn btn-primary">Create Job</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
