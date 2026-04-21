@@ -1,59 +1,121 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title><%= title %></title>
-  <link rel="stylesheet" href="/styles.css" />
-</head>
-<body>
-  <div class="print-shell">
-    <div class="print-head">
-      <div>
-        <h1 style="margin:0;"><%= shopName %> Production Sheet</h1>
-        <div>Job <strong><%= job.job_number %></strong></div>
-      </div>
-      <div class="no-print">
-        <button class="btn btn-primary" onclick="window.print()">Print</button>
-      </div>
-    </div>
+require('dotenv').config();
+const express = require('express');
+const session = require('express-session');
+const nodemailer = require('nodemailer');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
+const path = require('path');
+const fs = require('fs');
 
-    <div class="print-grid">
-      <div class="print-box">
-        <h3>Customer</h3>
-        <p><strong>Name:</strong> <%= job.customer_name || '—' %><br>
-        <strong>Company:</strong> <%= job.company_name || '—' %><br>
-        <strong>Email:</strong> <%= job.customer_email || '—' %><br>
-        <strong>Due:</strong> <%= job.due_date || '—' %></p>
-      </div>
-      <div class="print-box">
-        <h3>Order</h3>
-        <p><strong>Garment:</strong> <%= job.garment || '—' %><br>
-        <strong>Garment Color:</strong> <%= job.garment_color || '—' %><br>
-        <strong>Process:</strong> <%= job.process || '—' %><br>
-        <strong>Print Locations:</strong> <%= job.print_locations || '—' %><br>
-        <strong>Imprint Colors:</strong> <%= job.imprint_colors || '—' %></p>
-      </div>
-      <div class="print-box">
-        <h3>Sizes</h3>
-        <div style="white-space:pre-line;"><%= job.total_sizes || '—' %></div>
-        <p><strong>Total Units:</strong> <%= job.total_quantity || '—' %></p>
-      </div>
-      <div class="print-box">
-        <h3>Production Notes</h3>
-        <p><strong>Internal Notes:</strong><br><span style="white-space:pre-line;"><%= job.internal_notes || '—' %></span></p>
-        <p><strong>Customer Notes:</strong><br><span style="white-space:pre-line;"><%= job.customer_notes || '—' %></span></p>
-        <p><strong>Price:</strong> <%= job.total_price || '—' %><br>
-        <strong>Shipping:</strong> <%= job.shipping_method || '—' %></p>
-      </div>
-    </div>
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    <% if (job.mockup_revisions && job.mockup_revisions.length) { %>
-      <div class="print-box" style="margin-top:18px;">
-        <h3>Mockup</h3>
-        <img src="/uploads/<%= job.mockup_revisions[0].filename %>" alt="Mockup" style="max-width:100%;max-height:500px;border:1px solid #ccc;border-radius:12px;" />
-      </div>
-    <% } %>
-  </div>
-</body>
-</html>
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secret',
+  resave: false,
+  saveUninitialized: true
+}));
+
+const upload = multer({ dest: 'uploads/' });
+
+const dataFile = path.join(__dirname, 'jobs.json');
+
+function getJobs() {
+  if (!fs.existsSync(dataFile)) return [];
+  return JSON.parse(fs.readFileSync(dataFile));
+}
+
+function saveJobs(jobs) {
+  fs.writeFileSync(dataFile, JSON.stringify(jobs, null, 2));
+}
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: false,
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
+
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+
+app.post('/login', (req, res) => {
+  if (req.body.username === process.env.ADMIN_USERNAME &&
+      req.body.password === process.env.ADMIN_PASSWORD) {
+    req.session.loggedIn = true;
+    return res.redirect('/');
+  }
+  res.send('Login failed');
+});
+
+app.get('/', (req, res) => {
+  if (!req.session.loggedIn) return res.redirect('/login');
+  const jobs = getJobs();
+  res.render('dashboard', { jobs });
+});
+
+app.post('/create-job', upload.single('mockup'), (req, res) => {
+  const jobs = getJobs();
+
+  const job = {
+    id: uuidv4(),
+    ...req.body,
+    mockup: req.file ? req.file.filename : null,
+    status: 'pending'
+  };
+
+  jobs.push(job);
+  saveJobs(jobs);
+
+  res.redirect('/');
+});
+
+app.post('/send-approval/:id', async (req, res) => {
+  const jobs = getJobs();
+  const job = jobs.find(j => j.id === req.params.id);
+
+  const link = `${process.env.BASE_URL}/approve/${job.id}`;
+
+  await transporter.sendMail({
+    from: process.env.SMTP_USER,
+    to: job.email,
+    subject: 'Approve your mockup',
+    html: `<a href="${link}">Click to approve</a>`
+  });
+
+  res.redirect('/');
+});
+
+app.get('/approve/:id', (req, res) => {
+  const jobs = getJobs();
+  const job = jobs.find(j => j.id === req.params.id);
+  res.render('customer-approval', { job });
+});
+
+app.post('/approve/:id', (req, res) => {
+  const jobs = getJobs();
+  const job = jobs.find(j => j.id === req.params.id);
+
+  job.status = req.body.action === 'approve' ? 'approved' : 'changes';
+  job.notes = req.body.notes;
+
+  saveJobs(jobs);
+
+  res.render('approval-result', { job });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
