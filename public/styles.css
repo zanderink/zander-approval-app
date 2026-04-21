@@ -9,34 +9,54 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  padding: 20px;
 }
 
 .login-inner {
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  width: 320px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  background: #ffffff;
+  padding: 32px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
   text-align: center;
+}
+
+.login-inner h1 {
+  margin: 0 0 8px;
+  color: #111;
+}
+
+.login-subtitle {
+  margin: 0 0 24px;
+  color: #666;
+}
+
+.field {
+  margin-bottom: 12px;
 }
 
 input {
   box-sizing: border-box;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  font-size: 16px;
 }
 
 button {
   background: #cf1124;
-  color: white;
+  color: #fff;
   border: none;
   width: 100%;
   padding: 12px;
   cursor: pointer;
   font-weight: bold;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-size: 16px;
 }
 
 button:hover {
-  opacity: 0.9;
+  opacity: 0.92;
 }
