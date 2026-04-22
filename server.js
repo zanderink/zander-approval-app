@@ -33,6 +33,17 @@ if (!fs.existsSync(uploadDir)) {
 
 const upload = multer({ dest: uploadDir });
 
+// Simple file DB (WORKING VERSION)
+const DATA_FILE = path.join(__dirname, 'jobs.json');
+
+function getJobs() {
+  if (!fs.existsSync(DATA_FILE)) return [];
+  return JSON.parse(fs.readFileSync(DATA_FILE));
+}
+
+function saveJobs(jobs) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(jobs, null, 2));
+}
 async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS jobs (
