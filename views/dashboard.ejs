@@ -106,4 +106,18 @@
     });
   </script>
 </body>
+<div id="previewModal" class="preview-modal" onclick="closePreview()">
+  <img id="previewImage">
+</div>
+
+<script>
+function openPreview(src){
+  document.getElementById('previewImage').src = src;
+  document.getElementById('previewModal').style.display = 'flex';
+}
+
+function closePreview(){
+  document.getElementById('previewModal').style.display = 'none';
+}
+</script>
 </html>
