@@ -7,20 +7,17 @@
   <link rel="stylesheet" href="/public/styles.css" />
 </head>
 <body>
-  <div class="login-shell">
+  <div class="login-page">
     <div class="login-card">
       <img src="/public/zander-logo.png" alt="Zander Ink Logo" class="login-logo" onerror="this.style.display='none'">
-      <h1>Zander Ink</h1>
-      <p>Approval System Login</p>
 
-      <form method="POST" action="/login">
-        <div class="field">
-          <input type="text" name="username" placeholder="Username" required />
-        </div>
-        <div class="field">
-          <input type="password" name="password" placeholder="Password" required />
-        </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;">Login</button>
+      <h1 class="login-title">Zander Ink</h1>
+      <p class="login-subtitle">Approval System Login</p>
+
+      <form method="POST" action="/login" class="login-form">
+        <input type="text" name="username" placeholder="Username" required>
+        <input type="password" name="password" placeholder="Password" required>
+        <button type="submit" class="btn btn-primary login-btn">Login</button>
       </form>
     </div>
   </div>
