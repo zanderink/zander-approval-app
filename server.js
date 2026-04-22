@@ -19,7 +19,6 @@ const pool = new Pool({
     ? { rejectUnauthorized: false }
     : false
 });
-});
  
 pool.query(`
 CREATE TABLE IF NOT EXISTS jobs (
