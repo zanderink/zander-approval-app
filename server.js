@@ -253,11 +253,11 @@ const transporter = nodemailer.createTransport({
 /* =========================
    AUTH ROUTES
 ========================= */
-app.get('/jobs/:id', requireLogin, async (req, res) => {
+app.get('/jobs/:id/edit', requireLogin, async (req, res) => {
   const job = await getJobByIdDB(req.params.id);
   if (!job) return res.status(404).send('Job not found');
 
-  res.render('job-detail', { job });
+  res.render('edit-job', { job });
 });
 
 app.post('/login', (req, res) => {
