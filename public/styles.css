@@ -258,3 +258,60 @@ label{
     grid-template-columns: 1fr;
   }
 }
+/* ===== DRAG BOARD ===== */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(220px, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.column {
+  background: #eef2f7;
+  border-radius: 14px;
+  padding: 14px;
+  min-height: 320px;
+}
+
+.column h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.board-card {
+  background: #fff;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  cursor: grab;
+}
+
+.board-card.dragging {
+  opacity: .5;
+}
+
+.board-link {
+  display: block;
+  color: #111;
+  text-decoration: none;
+}
+
+.board-link strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+@media (max-width: 1400px) {
+  .board {
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+}
