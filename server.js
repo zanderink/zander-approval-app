@@ -44,30 +44,6 @@ function getJobs() {
 function saveJobs(jobs) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(jobs, null, 2));
 }
-async function initDb() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS jobs (
-      id TEXT PRIMARY KEY,
-      customer_name TEXT,
-      company_name TEXT,
-      customer_email TEXT,
-      garment TEXT,
-      garment_color TEXT,
-      process TEXT,
-      print_locations TEXT,
-      imprint_colors TEXT,
-      total_sizes TEXT,
-      total_quantity TEXT,
-      total_price TEXT,
-      notes TEXT,
-      mockup TEXT,
-      status TEXT DEFAULT 'Pending Approval',
-      approval_status TEXT DEFAULT 'Waiting',
-      customer_notes TEXT,
-      created_at TIMESTAMP DEFAULT NOW()
-    )
-  `);
-}
 
 function requireLogin(req, res, next) {
   if (!req.session.loggedIn) return res.redirect('/login');
