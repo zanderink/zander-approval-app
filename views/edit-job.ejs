@@ -51,7 +51,32 @@
             <option <%= job.garment === '1/4 Zip' ? 'selected' : '' %>>1/4 Zip</option>
           </select>
         </div>
+<div>
+  <label>Due Date</label>
+  <input type="date" name="due_date" value="<%= job.due_date || '' %>" />
+</div>
 
+<div>
+  <label>PO Number</label>
+  <input name="po_number" value="<%= job.po_number || '' %>" />
+</div>
+
+<div>
+  <label>Rush Order</label>
+  <select name="rush_order">
+    <option value="No" <%= job.rush_order === 'No' ? 'selected' : '' %>>No</option>
+    <option value="Yes" <%= job.rush_order === 'Yes' ? 'selected' : '' %>>Yes</option>
+  </select>
+</div>
+
+<div>
+  <label>Fulfillment</label>
+  <select name="fulfillment">
+    <option value="" <%= !job.fulfillment ? 'selected' : '' %>>Select</option>
+    <option value="Pickup" <%= job.fulfillment === 'Pickup' ? 'selected' : '' %>>Pickup</option>
+    <option value="Ship" <%= job.fulfillment === 'Ship' ? 'selected' : '' %>>Ship</option>
+  </select>
+</div>
         <div>
           <label>Garment Color</label>
           <input name="garment_color" value="<%= job.garment_color || '' %>" />
