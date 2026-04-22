@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zander Ink Dashboard</title>
-  <link rel="stylesheet" href="/public/styles.css">
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <h1>Zander Ink Dashboard</h1>
 
   <div class="top-links">
-    <a href="/jobs/new">+ Create New Job</a> |
+    <a href="/jobs/new">+ Create New Job</a>
     <a href="/logout">Log Out</a>
   </div>
 
@@ -25,48 +27,48 @@
       <div class="column" data-status="<%= column %>">
         <h3><%= column %></h3>
 
-<% jobs
-  .filter(j => (j.status || '').trim() === column.trim())
-  .forEach(job => { %>
+        <% jobs
+          .filter(job => (job.status || '').trim() === column.trim())
+          .forEach(job => { %>
 
-  <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status %>">
+          <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status %>">
+            <% if (job.mockup) { %>
+              <img
+                src="<%= job.mockup %>"
+                alt="Mockup"
+                class="job-thumb preview-img"
+              />
+            <% } else { %>
+              <div class="job-thumb job-thumb-placeholder">No Preview</div>
+            <% } %>
 
-    <% if (job.mockup) { %>
-      <img
-        src="<%= job.mockup %>"
-        alt="Mockup"
-        class="job-thumb preview-img"
-        onclick="openPreview('<%= job.mockup %>', '<%= job.customer_name || 'No customer' %>', '<%= job.process || 'Print' %>', '<%= job.total_price || '' %>', '/jobs/<%= job.id %>')"
-      >
-    <% } else { %>
-      <div class="job-thumb job-thumb-placeholder">No Preview</div>
-    <% } %>
-  <div class="badge"><%= job.process || 'Print' %></div>
-    <div class="job-card-top">
-      <div class="job-name"><%= job.customer_name || 'No customer' %></div>
-      <div class="job-badge <%= (job.approval_status || 'waiting').toLowerCase().replace(/\s+/g,'-') %>">
-        <%= job.approval_status || 'Waiting' %>
-      </div>
-    </div>
+            <div class="badge"><%= job.process || 'Print' %></div>
 
-    <div class="job-meta"><%= job.company_name || '' %></div>
-   <div class="job-meta"><strong><%= job.process || '' %></strong></div>
-    <div class="job-meta"><%= job.garment_color || '' %></div>
-<div class="job-meta">Due: <%= job.due_date || '-' %></div>
-<div class="job-meta">PO: <%= job.po_number || '-' %></div>
-<div class="job-meta">Rush: <%= job.rush_order || 'No' %></div>
-<div class="job-meta"><%= job.fulfillment || '' %></div>
+            <div class="job-card-top">
+              <div class="job-name"><%= job.customer_name || 'No customer' %></div>
+              <div class="job-badge <%= (job.approval_status || 'waiting').toLowerCase().replace(/\s+/g, '-') %>">
+                <%= job.approval_status || 'Waiting' %>
+              </div>
+            </div>
 
-<% if (job.fulfillment === 'Ship' && job.shipping_address) { %>
-  <div class="job-meta">Ship: Yes</div>
-<% } %>
-<div class="job-meta"><%= job.fulfillment || '' %></div>
-    <div class="job-bottom">
-      <div class="job-price"><%= job.total_price || '' %></div>
-      <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
-    </div>
-  </div>
-</div> 
+            <div class="job-meta"><%= job.company_name || '' %></div>
+            <div class="job-meta"><strong><%= job.process || '' %></strong></div>
+            <div class="job-meta"><%= job.garment_color || '' %></div>
+            <div class="job-meta">Due: <%= job.due_date || '-' %></div>
+            <div class="job-meta">PO: <%= job.po_number || '-' %></div>
+            <div class="job-meta">Rush: <%= job.rush_order || 'No' %></div>
+            <div class="job-meta"><%= job.fulfillment || '' %></div>
+
+            <% if (job.fulfillment === 'Ship' && job.shipping_address) { %>
+              <div class="job-meta">Ship: Yes</div>
+            <% } %>
+
+            <div class="job-bottom">
+              <div class="job-price"><%= job.total_price || '' %></div>
+              <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
+            </div>
+          </div>
+
         <% }) %>
       </div>
     <% }) %>
@@ -120,30 +122,4 @@
     });
   </script>
 </body>
-<div id="previewModal" class="preview-modal" onclick="closePreview()">
-  <div class="preview-card" onclick="event.stopPropagation()">
-    <img id="previewImage" class="preview-main-image">
-    <div class="preview-info">
-      <div id="previewName" class="preview-name"></div>
-      <div id="previewProcess" class="preview-meta"></div>
-      <div id="previewPrice" class="preview-meta"></div>
-      <a id="previewOpenBtn" class="open-btn" href="#">Open Job</a>
-    </div>
-  </div>
-</div>
-
-<script>
-function openPreview(src, name, process, price, link){
-  document.getElementById('previewImage').src = src;
-  document.getElementById('previewName').textContent = name || '';
-  document.getElementById('previewProcess').textContent = process || '';
-  document.getElementById('previewPrice').textContent = price || '';
-  document.getElementById('previewOpenBtn').href = link || '#';
-  document.getElementById('previewModal').style.display = 'flex';
-}
-
-function closePreview(){
-  document.getElementById('previewModal').style.display = 'none';
-}
-</script>
 </html>
