@@ -346,13 +346,6 @@ app.post('/jobs/:id/move', requireLogin, async (req, res) => {
   res.json({ ok: true });
 });
 
-initDb()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error('DB INIT ERROR:', err);
-    process.exit(1);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on ${PORT}`);
+});
