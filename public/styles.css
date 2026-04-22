@@ -213,3 +213,48 @@ label{
     grid-template-columns:1fr;
   }
 }
+/* ===== CUSTOMER APPROVAL PAGE ===== */
+
+.page.narrow {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+.mockup-image {
+  max-width: 100%;
+  max-height: 520px;
+  display: block;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.btn-green {
+  background: #15803d;
+  color: white;
+}
+
+.btn-red {
+  background: #b91c1c;
+  color: white;
+}
+
+@media (max-width: 760px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
