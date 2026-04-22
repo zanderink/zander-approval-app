@@ -9,11 +9,11 @@
 <body>
   <div class="page narrow">
     <div class="card">
-      <% if (job.approval_status === 'APPROVED') { %>
+      <% if (job && job.approval_status === 'APPROVED') { %>
         <div class="big-banner approved">APPROVED</div>
       <% } else { %>
         <div class="big-banner changes">REQUEST CHANGES</div>
-        <% if (job.customer_notes) { %>
+        <% if (job && job.customer_notes) { %>
           <p><strong>Requested changes:</strong> <%= job.customer_notes %></p>
         <% } %>
       <% } %>
