@@ -33,10 +33,12 @@
       <form method="POST" action="/approve/<%= job.id %>" style="margin-top:20px;">
         <label for="customer_notes">If you want changes, type them here:</label>
         <textarea
-          id="customer_notes"
-          name="customer_notes"
-          placeholder="Example: move the back print up, make the left chest smaller, change red to royal"
-        ></textarea>
+  id="customer_notes"
+  name="customer_notes"
+  placeholder="Example: move the back print up, make left chest smaller, change red to royal..."
+  rows="6"
+  style="width:100%; padding:12px; font-size:16px; border-radius:10px; border:1px solid #ccc; resize:vertical;"
+></textarea>
 
         <div class="button-row">
           <button class="btn btn-green" type="submit" name="action" value="approve">Approve</button>
