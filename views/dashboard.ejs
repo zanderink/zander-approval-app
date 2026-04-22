@@ -1,97 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Zander Ink Dashboard</title>
-  <link rel="stylesheet" href="/public/styles.css" />
+  <link rel="stylesheet" href="/public/styles.css">
 </head>
+
 <body>
-  <div class="page">
-    <div class="topbar">
-      <div class="brand-wrap">
-        <img src="/public/zander-logo.png" alt="Zander Ink Logo" class="brand-logo" onerror="this.style.display='none'">
-        <div>
-          <h1 class="brand-title">Zander Ink Dashboard</h1>
-          <p class="brand-subtitle">Approvals. Changes. Production release.</p>
-        </div>
-      </div>
+  <h1>Zander Ink Dashboard</h1>
 
-      <div class="top-actions">
-        <a class="btn btn-primary" href="/jobs/new">+ Create New Job</a>
-        <a class="btn btn-light" href="/logout">Log Out</a>
-      </div>
-    </div>
+  <div style="margin-bottom:20px;">
+    <a href="/jobs/new">+ Create New Job</a> |
+    <a href="/logout">Log Out</a>
+  </div>
 
-    <div class="board">
-      <% const columns = [
-        'Pending Approval',
-        'Changes Requested',
-        'Approved',
-        'Ready for Production',
-        'In Production',
-        'Completed'
-      ]; %>
+  <div class="board">
 
-      <% columns.forEach(column => { %>
-        <div class="column" data-status="<%= column %>">
-          <h3><%= column %></h3>
-
-          <% jobs.filter(j => (j.status || '') === column || (column === 'Pending Approval' && (j.status || '') === 'pending')).forEach(job => { %>
-            <div class="board-card" draggable="true" data-id="<%= job.id %>">
-              <a href="/jobs/<%= job.id %>" class="board-link">
-                <strong><%= job.customer_name || 'No customer' %></strong>
-                <div><%= job.company_name || '' %></div>
-                <div><%= job.garment || '' %></div>
-                <div><%= job.total_price || '' %></div>
-              </a>
-            </div>
-          <% }) %>
+    <!-- Pending -->
+    <div class="column">
+      <h3>Pending Approval</h3>
+      <% jobs.filter(j => !j.status || j.status === 'Pending Approval').forEach(job => { %>
+        <div class="card">
+          <strong><%= job.customer_name %></strong><br>
+          <%= job.garment %><br>
+          <a href="/jobs/<%= job.id %>">Open</a>
         </div>
       <% }) %>
     </div>
+
+    <!-- Changes -->
+    <div class="column">
+      <h3>Changes Requested</h3>
+      <% jobs.filter(j => j.status === 'Changes Requested').forEach(job => { %>
+        <div class="card">
+          <strong><%= job.customer_name %></strong><br>
+          <%= job.garment %><br>
+          <a href="/jobs/<%= job.id %>">Open</a>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Approved -->
+    <div class="column">
+      <h3>Approved</h3>
+      <% jobs.filter(j => j.status === 'Approved').forEach(job => { %>
+        <div class="card">
+          <strong><%= job.customer_name %></strong><br>
+          <%= job.garment %><br>
+          <a href="/jobs/<%= job.id %>">Open</a>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Production -->
+    <div class="column">
+      <h3>In Production</h3>
+      <% jobs.filter(j => j.status === 'In Production').forEach(job => { %>
+        <div class="card">
+          <strong><%= job.customer_name %></strong><br>
+          <%= job.garment %><br>
+          <a href="/jobs/<%= job.id %>">Open</a>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Completed -->
+    <div class="column">
+      <h3>Completed</h3>
+      <% jobs.filter(j => j.status === 'Completed').forEach(job => { %>
+        <div class="card">
+          <strong><%= job.customer_name %></strong><br>
+          <%= job.garment %><br>
+          <a href="/jobs/<%= job.id %>">Open</a>
+        </div>
+      <% }) %>
+    </div>
+
   </div>
 
-  <script>
-    let draggedCard = null;
-
-    document.querySelectorAll('.board-card').forEach(card => {
-      card.addEventListener('dragstart', () => {
-        draggedCard = card;
-        card.classList.add('dragging');
-      });
-
-      card.addEventListener('dragend', () => {
-        card.classList.remove('dragging');
-      });
-    });
-
-    document.querySelectorAll('.column').forEach(column => {
-      column.addEventListener('dragover', e => {
-        e.preventDefault();
-      });
-
-      column.addEventListener('drop', async e => {
-        e.preventDefault();
-        if (!draggedCard) return;
-
-        column.appendChild(draggedCard);
-
-        const jobId = draggedCard.dataset.id;
-        const status = column.dataset.status;
-
-        try {
-          await fetch(`/jobs/${jobId}/move`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
-          });
-        } catch (err) {
-          console.error(err);
-          alert('Move failed');
-        }
-      });
-    });
-  </script>
 </body>
 </html>
