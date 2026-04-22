@@ -112,12 +112,24 @@
   </script>
 </body>
 <div id="previewModal" class="preview-modal" onclick="closePreview()">
-  <img id="previewImage">
+  <div class="preview-card" onclick="event.stopPropagation()">
+    <img id="previewImage" class="preview-main-image">
+    <div class="preview-info">
+      <div id="previewName" class="preview-name"></div>
+      <div id="previewProcess" class="preview-meta"></div>
+      <div id="previewPrice" class="preview-meta"></div>
+      <a id="previewOpenBtn" class="open-btn" href="#">Open Job</a>
+    </div>
+  </div>
 </div>
 
 <script>
-function openPreview(src){
+function openPreview(src, name, process, price, link){
   document.getElementById('previewImage').src = src;
+  document.getElementById('previewName').textContent = name || '';
+  document.getElementById('previewProcess').textContent = process || '';
+  document.getElementById('previewPrice').textContent = price || '';
+  document.getElementById('previewOpenBtn').href = link || '#';
   document.getElementById('previewModal').style.display = 'flex';
 }
 
