@@ -16,7 +16,10 @@
           <p class="brand-subtitle"><%= job.company_name || '' %></p>
         </div>
       </div>
-      <a class="btn btn-light" href="/">Back to Dashboard</a>
+      <div class="top-actions">
+        <a class="btn btn-light" href="/">Back to Dashboard</a>
+        <a class="btn btn-primary" href="/jobs/<%= job.id %>/edit">Edit Job</a>
+      </div>
     </div>
 
     <% if (job.approval_status === 'APPROVED') { %>
@@ -29,6 +32,46 @@
         <% } %>
       </div>
     <% } %>
+
+    <div class="card">
+      <h2 class="panel-title">Production Status</h2>
+      <div class="button-row">
+        <form method="POST" action="/jobs/<%= job.id %>/status" style="display:inline;">
+          <input type="hidden" name="status" value="Pending Approval">
+          <button class="btn btn-light" type="submit">Pending Approval</button>
+        </form>
+
+        <form method="POST" action="/jobs/<%= job.id %>/status" style="display:inline;">
+          <input type="hidden" name="status" value="Changes Requested">
+          <button class="btn btn-red" type="submit">Changes Requested</button>
+        </form>
+
+        <form method="POST" action="/jobs/<%= job.id %>/status" style="display:inline;">
+          <input type="hidden" name="status" value="Approved">
+          <button class="btn btn-green" type="submit">Approved</button>
+        </form>
+
+        <form method="POST" action="/jobs/<%= job.id %>/status" style="display:inline;">
+          <input type="hidden" name="status" value="Ready for Production">
+          <button class="btn btn-primary" type="submit">Ready for Production</button>
+        </form>
+
+        <form method="POST" action="/jobs/<%= job.id %>/status" style="display:inline;">
+          <input type="hidden" name="status" value="In Production">
+          <button class="btn btn-primary" type="submit">In Production</button>
+        </form>
+
+        <form method="POST" action="/jobs/<%= job.id %>/status" style="display:inline;">
+          <input type="hidden" name="status" value="Completed">
+          <button class="btn btn-green" type="submit">Completed</button>
+        </form>
+
+        <form method="POST" action="/jobs/<%= job.id %>/status" style="display:inline;">
+          <input type="hidden" name="status" value="Delivered / Picked Up">
+          <button class="btn btn-light" type="submit">Delivered / Picked Up</button>
+        </form>
+      </div>
+    </div>
 
     <div class="detail-grid">
       <div class="card">
@@ -43,6 +86,9 @@
         <p><strong>Total Quantity:</strong> <%= job.total_quantity || '-' %></p>
         <p><strong>Total Price:</strong> <%= job.total_price || '-' %></p>
         <p><strong>Status:</strong> <%= job.status || '-' %></p>
+        <% if (job.notes) { %>
+          <p><strong>Internal Notes:</strong> <%= job.notes %></p>
+        <% } %>
       </div>
 
       <div class="card">
@@ -57,9 +103,11 @@
 
     <div class="card">
       <h2 class="panel-title">Actions</h2>
-      <form method="POST" action="/jobs/<%= job.id %>/send-approval">
-        <button type="submit" class="btn btn-primary">Send / Resend Approval</button>
-      </form>
+      <div class="button-row">
+        <form method="POST" action="/jobs/<%= job.id %>/send-approval">
+          <button type="submit" class="btn btn-primary">Send / Resend Approval</button>
+        </form>
+      </div>
     </div>
   </div>
 </body>
