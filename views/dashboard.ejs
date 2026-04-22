@@ -4,7 +4,6 @@
   <title>Zander Ink Dashboard</title>
   <link rel="stylesheet" href="/public/styles.css">
 </head>
-
 <body>
   <h1>Zander Ink Dashboard</h1>
 
@@ -13,69 +12,78 @@
     <a href="/logout">Log Out</a>
   </div>
 
+  <% const columns = [
+    'Pending Approval',
+    'Changes Requested',
+    'Approved',
+    'In Production',
+    'Completed'
+  ]; %>
+
   <div class="board">
+    <% columns.forEach(column => { %>
+      <div class="column" data-status="<%= column %>">
+        <h3><%= column %></h3>
 
-    <!-- Pending -->
-    <div class="column">
-      <h3>Pending Approval</h3>
-      <% jobs.filter(j => !j.status || j.status === 'Pending Approval').forEach(job => { %>
-        <div class="card">
-          <strong><%= job.customer_name %></strong><br>
-          <%= job.garment %><br>
-          <a href="/jobs/<%= job.id %>">Open</a>
-        </div>
-      <% }) %>
-    </div>
-
-    <!-- Changes -->
-    <div class="column">
-      <h3>Changes Requested</h3>
-      <% jobs.filter(j => j.status === 'Changes Requested').forEach(job => { %>
-        <div class="card">
-          <strong><%= job.customer_name %></strong><br>
-          <%= job.garment %><br>
-          <a href="/jobs/<%= job.id %>">Open</a>
-        </div>
-      <% }) %>
-    </div>
-
-    <!-- Approved -->
-    <div class="column">
-      <h3>Approved</h3>
-      <% jobs.filter(j => j.status === 'Approved').forEach(job => { %>
-        <div class="card">
-          <strong><%= job.customer_name %></strong><br>
-          <%= job.garment %><br>
-          <a href="/jobs/<%= job.id %>">Open</a>
-        </div>
-      <% }) %>
-    </div>
-
-    <!-- Production -->
-    <div class="column">
-      <h3>In Production</h3>
-      <% jobs.filter(j => j.status === 'In Production').forEach(job => { %>
-        <div class="card">
-          <strong><%= job.customer_name %></strong><br>
-          <%= job.garment %><br>
-          <a href="/jobs/<%= job.id %>">Open</a>
-        </div>
-      <% }) %>
-    </div>
-
-    <!-- Completed -->
-    <div class="column">
-      <h3>Completed</h3>
-      <% jobs.filter(j => j.status === 'Completed').forEach(job => { %>
-        <div class="card">
-          <strong><%= job.customer_name %></strong><br>
-          <%= job.garment %><br>
-          <a href="/jobs/<%= job.id %>">Open</a>
-        </div>
-      <% }) %>
-    </div>
-
+        <% jobs
+          .filter(j => (j.status || 'Pending Approval') === column || (!j.status && column === 'Pending Approval'))
+          .forEach(job => { %>
+            <div class="card board-card" draggable="true" data-id="<%= job.id %>">
+              <strong><%= job.customer_name || 'No customer' %></strong><br>
+              <%= job.garment || '' %><br>
+              <a href="/jobs/<%= job.id %>">Open</a>
+            </div>
+        <% }) %>
+      </div>
+    <% }) %>
   </div>
 
+  <script>
+    let draggedCard = null;
+
+    document.querySelectorAll('.board-card').forEach(card => {
+      card.addEventListener('dragstart', () => {
+        draggedCard = card;
+        card.classList.add('dragging');
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+        draggedCard = null;
+      });
+    });
+
+    document.querySelectorAll('.column').forEach(column => {
+      column.addEventListener('dragover', e => {
+        e.preventDefault();
+      });
+
+      column.addEventListener('drop', async e => {
+        e.preventDefault();
+        if (!draggedCard) return;
+
+        column.appendChild(draggedCard);
+
+        const jobId = draggedCard.dataset.id;
+        const status = column.dataset.status;
+
+        try {
+          const res = await fetch(`/jobs/${jobId}/move`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+          });
+
+          if (!res.ok) {
+            alert('Move failed');
+            window.location.reload();
+          }
+        } catch (err) {
+          alert('Move failed');
+          window.location.reload();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
