@@ -23,29 +23,75 @@
       </div>
     </div>
 
-    <% if (!jobs || jobs.length === 0) { %>
-      <div class="card">
-        <h2 class="panel-title">No jobs yet</h2>
-        <p class="muted">Create your first approval job to get started.</p>
-      </div>
-    <% } else { %>
-      <div class="job-grid">
-        <% jobs.slice().reverse().forEach(job => { %>
-          <a class="job-card" href="/jobs/<%= job.id %>">
-            <div class="job-card-top">
-              <strong><%= job.customer_name || 'No customer' %></strong>
-              <span class="status-pill"><%= job.status || 'Draft' %></span>
+    <div class="board">
+      <% const columns = [
+        'Pending Approval',
+        'Changes Requested',
+        'Approved',
+        'Ready for Production',
+        'In Production',
+        'Completed'
+      ]; %>
+
+      <% columns.forEach(column => { %>
+        <div class="column" data-status="<%= column %>">
+          <h3><%= column %></h3>
+
+          <% jobs.filter(j => (j.status || '') === column || (column === 'Pending Approval' && (j.status || '') === 'pending')).forEach(job => { %>
+            <div class="board-card" draggable="true" data-id="<%= job.id %>">
+              <a href="/jobs/<%= job.id %>" class="board-link">
+                <strong><%= job.customer_name || 'No customer' %></strong>
+                <div><%= job.company_name || '' %></div>
+                <div><%= job.garment || '' %></div>
+                <div><%= job.total_price || '' %></div>
+              </a>
             </div>
-            <div class="muted"><%= job.company_name || '' %></div>
-            <div><%= job.garment || '' %></div>
-            <div><%= job.total_price || '' %></div>
-            <div class="approval-tag <%= (job.approval_status || 'waiting').toLowerCase().replace(/\s+/g,'-') %>">
-              <%= job.approval_status || 'Waiting' %>
-            </div>
-          </a>
-        <% }) %>
-      </div>
-    <% } %>
+          <% }) %>
+        </div>
+      <% }) %>
+    </div>
   </div>
+
+  <script>
+    let draggedCard = null;
+
+    document.querySelectorAll('.board-card').forEach(card => {
+      card.addEventListener('dragstart', () => {
+        draggedCard = card;
+        card.classList.add('dragging');
+      });
+
+      card.addEventListener('dragend', () => {
+        card.classList.remove('dragging');
+      });
+    });
+
+    document.querySelectorAll('.column').forEach(column => {
+      column.addEventListener('dragover', e => {
+        e.preventDefault();
+      });
+
+      column.addEventListener('drop', async e => {
+        e.preventDefault();
+        if (!draggedCard) return;
+
+        column.appendChild(draggedCard);
+
+        const jobId = draggedCard.dataset.id;
+        const status = column.dataset.status;
+
+        try {
+          await fetch(`/jobs/${jobId}/move`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+          });
+        } catch (err) {
+          console.error(err);
+          alert('Move failed');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
