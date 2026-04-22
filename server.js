@@ -208,27 +208,31 @@ app.get('/jobs/new', requireLogin, (req, res) => {
 app.post('/jobs', requireLogin, upload.single('mockup'), (req, res) => {
   const jobs = getJobs();
 
-  const job = {
-    id: uuidv4(),
-    customer_name: req.body.customer_name || '',
-    company_name: req.body.company_name || '',
-    customer_email: req.body.customer_email || '',
-    garment: req.body.garment || '',
-    garment_color: buildGarmentColor(req.body),
-    process: req.body.process || '',
-    print_locations: buildPrintLocations(req.body),
-    imprint_colors: req.body.imprint_colors || '',
-    total_sizes: buildTotalSizes(req.body),
-    total_quantity: buildTotalQuantity(req.body),
-    total_price: req.body.total_price || '',
-    notes: req.body.notes || '',
-    mockup: req.file ? `/public/uploads/${req.file.filename}` : null,
-    status: 'Pending Approval',
-    approval_status: 'Waiting',
-    customer_notes: '',
-    created_at: new Date().toISOString()
-  };
-
+ 
+const job = {
+  id: uuidv4(),
+  customer_name: req.body.customer_name || '',
+  company_name: req.body.company_name || '',
+  customer_email: req.body.customer_email || '',
+  garment: req.body.garment || '',
+  garment_color: buildGarmentColor(req.body),
+  process: req.body.process || '',
+  print_locations: buildPrintLocations(req.body),
+  imprint_colors: req.body.imprint_colors || '',
+  total_sizes: buildTotalSizes(req.body),
+  total_quantity: buildTotalQuantity(req.body),
+  total_price: req.body.total_price || '',
+  due_date: req.body.due_date || '',
+  po_number: req.body.po_number || '',
+  rush_order: req.body.rush_order || 'No',
+  fulfillment: req.body.fulfillment || '',
+  notes: req.body.notes || '',
+  mockup: req.file ? `/public/uploads/${req.file.filename}` : null,
+  status: 'Pending Approval',
+  approval_status: 'Waiting',
+  customer_notes: '',
+  created_at: new Date().toISOString()
+};
   jobs.push(job);
   saveJobs(jobs);
 
