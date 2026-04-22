@@ -9,7 +9,7 @@
 <body>
   <div class="page narrow">
     <div class="card">
-      <h1>Review Your Mockup</h1>
+      <h1 class="panel-title">Review Your Mockup</h1>
 
       <% if (job.mockup) { %>
         <img src="<%= job.mockup %>" class="mockup-image" alt="Mockup">
@@ -24,7 +24,6 @@
 
       <form method="POST" action="/approve/<%= job.id %>">
         <textarea name="customer_notes" placeholder="If requesting changes, type what you want changed here"></textarea>
-
         <div class="button-row">
           <button class="btn btn-green" type="submit" name="action" value="approve">Approve</button>
           <button class="btn btn-red" type="submit" name="action" value="changes">Request Changes</button>
