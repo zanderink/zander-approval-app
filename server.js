@@ -156,7 +156,31 @@ app.get('/approve/:id', (req, res) => {
 
   res.render('customer-approval', { job });
 });
+app.post('/approve/:id', (req, res) => {
+  const jobs = getJobs();
+  const job = jobs.find(j => j.id === req.params.id);
 
+  if (!job) {
+    return res.status(404).send('Job not found');
+  }
+
+  const action = req.body.action;
+  const customerNotes = req.body.customer_notes || '';
+
+  if (action === 'approve') {
+    job.approval_status = 'APPROVED';
+    job.status = 'Ready for Production';
+  } else {
+    job.approval_status = 'REQUEST CHANGES';
+    job.status = 'Changes Requested';
+  }
+
+  job.customer_notes = customerNotes;
+
+  saveJobs(jobs);
+
+  res.render('approval-result', { job });
+});
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
