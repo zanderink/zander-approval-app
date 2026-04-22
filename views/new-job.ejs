@@ -89,7 +89,32 @@
             <option>Direct to Film</option>
           </select>
         </div>
+<div>
+  <label>Due Date</label>
+  <input type="date" name="due_date" />
+</div>
 
+<div>
+  <label>PO Number</label>
+  <input name="po_number" placeholder="PO Number" />
+</div>
+
+<div>
+  <label>Rush Order</label>
+  <select name="rush_order">
+    <option value="No">No</option>
+    <option value="Yes">Yes</option>
+  </select>
+</div>
+
+<div>
+  <label>Fulfillment</label>
+  <select name="fulfillment">
+    <option value="">Select</option>
+    <option value="Pickup">Pickup</option>
+    <option value="Ship">Ship</option>
+  </select>
+</div>
         <div class="full">
           <label>Print Locations</label>
           <div id="printLocationRows">
