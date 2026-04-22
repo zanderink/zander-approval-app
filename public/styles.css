@@ -395,11 +395,9 @@ label{
 
 .job-thumb{
   width:100%;
-  height:110px;
+  height:80px;
   object-fit:cover;
-  border-radius:8px;
-  margin-bottom:8px;
-  background:#fff;
+  display:block;
 }
 
 .job-sub{
