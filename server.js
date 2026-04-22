@@ -19,6 +19,41 @@ const pool = new Pool({
     ? { rejectUnauthorized: false }
     : false
 });
+});
+ 
+// 👇 ADD THIS RIGHT HERE
+
+pool.query(`
+CREATE TABLE IF NOT EXISTS jobs (
+  id TEXT PRIMARY KEY,
+  customer_name TEXT,
+  company_name TEXT,
+  customer_email TEXT,
+  garment TEXT,
+  garment_color TEXT,
+  process TEXT,
+  print_locations TEXT,
+  imprint_colors TEXT,
+  total_sizes TEXT,
+  total_quantity TEXT,
+  total_price TEXT,
+  due_date TEXT,
+  po_number TEXT,
+  rush_order TEXT,
+  fulfillment TEXT,
+  shipping_address TEXT,
+  notes TEXT,
+  mockup TEXT,
+  status TEXT,
+  approval_status TEXT,
+  customer_notes TEXT,
+  created_at TEXT
+);
+`).then(() => {
+  console.log('TABLE READY');
+}).catch(err => {
+  console.error('TABLE ERROR:', err);
+});
 async function getAllJobsDB() {
   const result = await pool.query('SELECT * FROM jobs ORDER BY created_at DESC');
   return result.rows;
