@@ -51,7 +51,10 @@
     <div class="job-meta"><%= job.company_name || '' %></div>
    <div class="job-meta"><strong><%= job.process || '' %></strong></div>
     <div class="job-meta"><%= job.garment_color || '' %></div>
-
+<div class="job-meta">Due: <%= job.due_date || '-' %></div>
+<div class="job-meta">PO: <%= job.po_number || '-' %></div>
+<div class="job-meta">Rush: <%= job.rush_order || 'No' %></div>
+<div class="job-meta"><%= job.fulfillment || '' %></div>
     <div class="job-bottom">
       <div class="job-price"><%= job.total_price || '' %></div>
       <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
