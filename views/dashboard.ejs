@@ -30,7 +30,12 @@
           .forEach(job => { %>
          <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status || 'Pending Approval' %>">
   <% if (job.mockup) { %>
-    <img src="<%= job.mockup %>" alt="Mockup" class="job-thumb">
+    <img
+  src="<%= job.mockup %>"
+  alt="Mockup"
+  class="job-thumb preview-img"
+  onclick="openPreview('<%= job.mockup %>', '<%= job.customer_name || 'No customer' %>', '<%= job.process || 'Print' %>', '<%= job.total_price || '' %>', '/jobs/<%= job.id %>')"
+>
   <% } else { %>
     <div class="job-thumb job-thumb-placeholder">No Preview</div>
   <% } %>
