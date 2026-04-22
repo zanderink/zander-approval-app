@@ -13,39 +13,285 @@
         <img src="/public/zander-logo.png" alt="Zander Ink Logo" class="brand-logo" onerror="this.style.display='none'">
         <div>
           <h1 class="brand-title">Create Approval Job</h1>
-          <p class="brand-subtitle">Build the job exactly like your localhost version.</p>
+          <p class="brand-subtitle">Build the job the way you liked it on localhost.</p>
         </div>
       </div>
       <a class="btn btn-light" href="/">Back to Dashboard</a>
     </div>
 
-    <div class="card">
-      <form action="/jobs" method="POST" enctype="multipart/form-data" class="form-grid">
-        
-        <input name="customer_name" placeholder="Customer Name" required>
-        <input name="company_name" placeholder="Company Name">
-        <input type="email" name="customer_email" placeholder="Customer Email" required>
-        <input name="garment" placeholder="Garment">
-        <input name="garment_color" placeholder="Garment Color">
-        <input name="imprint_colors" placeholder="Imprint Colors">
-        <input name="print_locations" placeholder="Print Locations">
-        <input name="total_sizes" placeholder="Sizes Breakdown">
-        <input name="total_quantity" placeholder="Total Quantity">
-        <input name="total_price" placeholder="Total Price">
+    <section class="card">
+      <p class="muted" style="margin-top:0;">
+        Enter the customer details, upload the mockup, and save the order into your approval system.
+      </p>
 
-        <textarea name="notes" placeholder="Notes / internal notes"></textarea>
+      <form action="/jobs" method="POST" enctype="multipart/form-data" class="form-grid" autocomplete="off">
+        <div>
+          <label>Job Number</label>
+          <input name="job_number" placeholder="Auto if left blank" />
+        </div>
 
         <div>
-          <label>Upload Mockup</label>
-          <input type="file" name="mockup">
+          <label>Company Name</label>
+          <input name="company_name" />
+        </div>
+
+        <div>
+          <label>Customer Name</label>
+          <input name="customer_name" required />
+        </div>
+
+        <div>
+          <label>Customer Email</label>
+          <input type="email" name="customer_email" required placeholder="customer@email.com" />
         </div>
 
         <div class="full">
-          <button type="submit" class="btn btn-primary">Create Job</button>
+          <label>Garment</label>
+          <div id="garmentRows">
+            <div class="dynamic-row">
+              <select name="garment_0" class="dynamic-select garment-select">
+                <option value="">Select garment</option>
+                <option value="Shirt">Shirt</option>
+                <option value="Long Sleeve">Long Sleeve</option>
+                <option value="Hoodie">Hoodie</option>
+                <option value="Jacket">Jacket</option>
+                <option value="Polo">Polo</option>
+                <option value="1/4 Zip">1/4 Zip</option>
+                <option value="__custom__">Other / Custom Garment</option>
+              </select>
+              <input name="garment_custom_0" class="dynamic-custom-input" placeholder="Type custom garment" />
+              <span></span>
+            </div>
+          </div>
+          <button class="btn btn-light" type="button" id="addGarmentBtn">Add Another Garment</button>
         </div>
 
+        <div>
+          <label>Garment Color</label>
+          <select name="garment_color" id="garment_color_select">
+            <option value="">Select color</option>
+            <option value="Black">Black</option>
+            <option value="White">White</option>
+            <option value="Sport Grey">Sport Grey</option>
+            <option value="Dark Heather">Dark Heather</option>
+            <option value="Red">Red</option>
+            <option value="Maroon">Maroon</option>
+            <option value="Royal">Royal</option>
+            <option value="Navy">Navy</option>
+            <option value="Carolina Blue">Carolina Blue</option>
+            <option value="Forest Green">Forest Green</option>
+            <option value="Orange">Orange</option>
+            <option value="Purple">Purple</option>
+            <option value="Gold">Gold</option>
+            <option value="Sand">Sand</option>
+            <option value="__custom__">Other / Custom Color</option>
+          </select>
+          <input name="garment_color_custom" id="garment_color_custom" placeholder="Type custom garment color" style="margin-top:8px;display:none;" />
+        </div>
+
+        <div>
+          <label>Process</label>
+          <select name="process" id="process_select">
+            <option value="">Select process</option>
+            <option value="Screen Print">Screen Print</option>
+            <option value="Embroidery">Embroidery</option>
+            <option value="Direct to Film">Direct to Film</option>
+            <option value="__custom__">Other / Custom</option>
+          </select>
+          <input name="process_custom" id="process_custom" placeholder="Type custom process" style="margin-top:8px;display:none;" />
+        </div>
+
+        <div class="full">
+          <label>Print Locations</label>
+          <div id="printLocationRows">
+            <div class="dynamic-row">
+              <select name="print_location_0" class="dynamic-select print-location-select">
+                <option value="">Select print location</option>
+                <option value="Front Left Chest">Front Left Chest</option>
+                <option value="Front Left Chest / Back">Front Left Chest / Back</option>
+                <option value="Full Front">Full Front</option>
+                <option value="Full Front / Full Back">Full Front / Full Back</option>
+                <option value="Sleeve">Sleeve</option>
+                <option value="__custom__">Other / Custom</option>
+              </select>
+              <input name="print_location_custom_0" class="dynamic-custom-input" placeholder="Type custom print location" />
+              <span></span>
+            </div>
+          </div>
+          <button class="btn btn-light" type="button" id="addLocationBtn">Add Another Location</button>
+        </div>
+
+        <div>
+          <label>Color of Imprint(s)</label>
+          <input name="imprint_colors" placeholder="White front / Red back" />
+        </div>
+
+        <div>
+          <label>Total Price</label>
+          <input name="total_price" placeholder="$499.00" />
+        </div>
+
+        <div>
+          <label>Due Date</label>
+          <input type="date" name="due_date" />
+        </div>
+
+        <div>
+          <label>Fulfillment</label>
+          <select name="fulfillment">
+            <option value="">None</option>
+            <option value="Pickup">Pickup</option>
+            <option value="Ship">Ship</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Shipping Method</label>
+          <input name="shipping_method" placeholder="UPS Ground / Customer Pickup" />
+        </div>
+
+        <div>
+          <label>Rush</label>
+          <select name="rush">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
+
+        <div class="full">
+          <label>Total Sizes</label>
+          <div class="grid-4">
+            <div><label style="font-size:13px;">S</label><input type="number" min="0" name="size_s" placeholder="0" /></div>
+            <div><label style="font-size:13px;">M</label><input type="number" min="0" name="size_m" placeholder="0" /></div>
+            <div><label style="font-size:13px;">L</label><input type="number" min="0" name="size_l" placeholder="0" /></div>
+            <div><label style="font-size:13px;">XL</label><input type="number" min="0" name="size_xl" placeholder="0" /></div>
+            <div><label style="font-size:13px;">2XL</label><input type="number" min="0" name="size_2xl" placeholder="0" /></div>
+            <div><label style="font-size:13px;">3XL</label><input type="number" min="0" name="size_3xl" placeholder="0" /></div>
+            <div><label style="font-size:13px;">4XL</label><input type="number" min="0" name="size_4xl" placeholder="0" /></div>
+            <div><label style="font-size:13px;">5XL</label><input type="number" min="0" name="size_5xl" placeholder="0" /></div>
+          </div>
+        </div>
+
+        <div>
+          <label>Main Mockup Image</label>
+          <input type="file" name="mockup" accept="image/*,.pdf" />
+        </div>
+
+        <div>
+          <label>Extra Files</label>
+          <input type="file" name="attachments" multiple />
+        </div>
+
+        <div class="full">
+          <label>Internal Notes</label>
+          <textarea name="notes" placeholder="Anything only your team should see"></textarea>
+        </div>
+
+        <div class="full">
+          <button class="btn btn-primary" type="submit">Save Job</button>
+        </div>
       </form>
-    </div>
+    </section>
   </div>
+
+  <script>
+    function toggleSingleCustom(selectId, inputId) {
+      const select = document.getElementById(selectId);
+      const input = document.getElementById(inputId);
+      if (!select || !input) return;
+      const sync = () => {
+        const show = select.value === '__custom__';
+        input.style.display = show ? 'block' : 'none';
+        if (!show) input.value = '';
+      };
+      select.addEventListener('change', sync);
+      sync();
+    }
+
+    function wireDynamicCustom(row) {
+      const select = row.querySelector('select');
+      const input = row.querySelector('.dynamic-custom-input');
+      if (!select || !input) return;
+      const sync = () => {
+        const show = select.value === '__custom__';
+        input.style.display = show ? 'block' : 'none';
+        if (!show) input.value = '';
+      };
+      select.addEventListener('change', sync);
+      sync();
+    }
+
+    function addDynamicRow(containerId, prefix, options, placeholder, customPlaceholder, customLabel) {
+      const container = document.getElementById(containerId);
+      const index = container.querySelectorAll('.dynamic-row').length;
+
+      const row = document.createElement('div');
+      row.className = 'dynamic-row';
+
+      const select = document.createElement('select');
+      select.name = `${prefix}_${index}`;
+
+      const first = document.createElement('option');
+      first.value = '';
+      first.textContent = placeholder;
+      select.appendChild(first);
+
+      options.forEach(option => {
+        const el = document.createElement('option');
+        el.value = option;
+        el.textContent = option;
+        select.appendChild(el);
+      });
+
+      const customOption = document.createElement('option');
+      customOption.value = '__custom__';
+      customOption.textContent = customLabel;
+      select.appendChild(customOption);
+
+      const input = document.createElement('input');
+      input.name = `${prefix}_custom_${index}`;
+      input.className = 'dynamic-custom-input';
+      input.placeholder = customPlaceholder;
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'btn btn-light';
+      remove.textContent = 'Remove';
+      remove.onclick = () => row.remove();
+
+      row.appendChild(select);
+      row.appendChild(input);
+      row.appendChild(remove);
+      container.appendChild(row);
+
+      wireDynamicCustom(row);
+    }
+
+    toggleSingleCustom('garment_color_select', 'garment_color_custom');
+    toggleSingleCustom('process_select', 'process_custom');
+    document.querySelectorAll('.dynamic-row').forEach(wireDynamicCustom);
+
+    document.getElementById('addGarmentBtn')?.addEventListener('click', () => {
+      addDynamicRow(
+        'garmentRows',
+        'garment',
+        ['Shirt', 'Long Sleeve', 'Hoodie', 'Jacket', 'Polo', '1/4 Zip'],
+        'Select garment',
+        'Type custom garment',
+        'Other / Custom Garment'
+      );
+    });
+
+    document.getElementById('addLocationBtn')?.addEventListener('click', () => {
+      addDynamicRow(
+        'printLocationRows',
+        'print_location',
+        ['Front Left Chest', 'Front Left Chest / Back', 'Full Front', 'Full Front / Full Back', 'Sleeve'],
+        'Select print location',
+        'Type custom print location',
+        'Other / Custom'
+      );
+    });
+  </script>
 </body>
 </html>
