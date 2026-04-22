@@ -137,7 +137,39 @@ app.post('/jobs/:id/send-approval', requireLogin, async (req, res) => {
       subject: `${process.env.SHOP_NAME || 'Zander Ink'} mockup approval`,
       html
     });
+app.get('/jobs/:id/edit', requireLogin, (req, res) => {
+  const jobs = getJobs();
+  const job = jobs.find(j => j.id === req.params.id);
+  if (!job) return res.status(404).send('Job not found');
 
+  res.render('edit-job', { job });
+});
+
+app.post('/jobs/:id/edit', requireLogin, upload.single('mockup'), (req, res) => {
+  const jobs = getJobs();
+  const job = jobs.find(j => j.id === req.params.id);
+  if (!job) return res.status(404).send('Job not found');
+
+  Object.assign(job, req.body);
+
+  if (req.file) {
+    job.mockup = `/public/uploads/${req.file.filename}`;
+  }
+
+  saveJobs(jobs);
+  res.redirect(`/jobs/${job.id}`);
+});
+
+app.post('/jobs/:id/status', requireLogin, (req, res) => {
+  const jobs = getJobs();
+  const job = jobs.find(j => j.id === req.params.id);
+  if (!job) return res.status(404).send('Job not found');
+
+  job.status = req.body.status;
+  saveJobs(jobs);
+
+  res.redirect(`/jobs/${job.id}`);
+});
     job.status = 'Sent';
     saveJobs(jobs);
 
