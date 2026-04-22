@@ -322,11 +322,12 @@ const job = {
   customer_notes: '',
   created_at: new Date().toISOString()
 };
-  jobs.push(job);
-  saveJobs(jobs);
-
-  res.redirect('/');
-});
+createJobDB(job)
+  .then(() => res.redirect('/'))
+  .catch(err => {
+    console.error('DB SAVE ERROR:', err);
+    res.status(500).send('Failed to save job');
+  });
 
 /* =========================
    JOB DETAIL / EDIT
