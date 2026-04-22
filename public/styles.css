@@ -290,3 +290,47 @@ label{
     grid-template-columns:1fr;
   }
 }
+.board-card-inner{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.board-thumb-wrap{
+  flex:0 0 64px;
+}
+
+.board-thumb{
+  width:64px;
+  height:64px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid #d1d5db;
+  background:#fff;
+  display:block;
+}
+
+.board-thumb-placeholder{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:11px;
+  color:#6b7280;
+  background:#f3f4f6;
+}
+
+.board-card-content{
+  flex:1;
+  min-width:0;
+}
+
+.board-card-content strong{
+  display:block;
+  margin-bottom:4px;
+}
+
+.board-open-link{
+  display:inline-block;
+  margin-top:6px;
+  font-weight:600;
+}
