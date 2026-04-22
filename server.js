@@ -176,7 +176,6 @@ app.post('/approve/:id', (req, res) => {
   }
 
   job.customer_notes = customerNotes;
-
   saveJobs(jobs);
 
   res.render('approval-result', { job });
