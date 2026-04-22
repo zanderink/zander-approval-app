@@ -25,10 +25,11 @@
       <div class="column" data-status="<%= column %>">
         <h3><%= column %></h3>
 
-         <% jobs
-         .filter(j => (j.status || '').trim() === column.trim())
-          .forEach(job => { %>
-      data-status="<%= job.status %>"
+<% jobs
+  .filter(j => (j.status || '').trim() === column.trim())
+  .forEach(job => { %>
+
+  <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status %>">
   <% if (job.mockup) { %>
     <img
   src="<%= job.mockup %>"
