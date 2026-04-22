@@ -391,3 +391,35 @@ label{
 .login-btn{
   width:100%;
 }
+/* JOB CARD UPGRADE */
+
+.job-thumb{
+  width:100%;
+  height:120px;
+  object-fit:cover;
+  border-radius:8px;
+  margin-bottom:8px;
+  background:#fff;
+}
+
+.job-sub{
+  font-size:13px;
+  color:#555;
+  margin-bottom:8px;
+}
+
+.open-btn{
+  display:block;
+  width:100%;
+  text-align:center;
+  background:black;
+  color:white;
+  padding:8px;
+  border-radius:8px;
+  font-weight:600;
+  margin-top:6px;
+}
+
+.open-btn:hover{
+  background:#333;
+}
