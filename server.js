@@ -271,13 +271,16 @@ app.post('/jobs', requireLogin, upload.single('mockup'), async (req, res) => {
     created_at: new Date().toISOString()
   };
 
-  try {
-    await createJobDB(job);
-    res.redirect('/');
-  } catch (err) {
-    console.error('DB SAVE ERROR:', err);
-    res.status(500).send('Failed to save job');
-  }
+console.log('ABOUT TO SAVE JOB:', job);
+
+try {
+  await createJobDB(job);
+  console.log('JOB SAVED OK:', job.id);
+  res.redirect('/');
+} catch (err) {
+  console.error('DB SAVE ERROR:', err);
+  res.status(500).send('Failed to save job');
+}
 });
 
 app.get('/jobs/:id', requireLogin, async (req, res) => {
