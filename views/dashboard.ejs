@@ -55,6 +55,11 @@
 <div class="job-meta">PO: <%= job.po_number || '-' %></div>
 <div class="job-meta">Rush: <%= job.rush_order || 'No' %></div>
 <div class="job-meta"><%= job.fulfillment || '' %></div>
+
+<% if (job.fulfillment === 'Ship' && job.shipping_address) { %>
+  <div class="job-meta">Ship: Yes</div>
+<% } %>
+<div class="job-meta"><%= job.fulfillment || '' %></div>
     <div class="job-bottom">
       <div class="job-price"><%= job.total_price || '' %></div>
       <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
