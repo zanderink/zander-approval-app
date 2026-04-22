@@ -35,7 +35,7 @@
     <div class="job-thumb job-thumb-placeholder">No Preview</div>
   <% } %>
 
-  <div class="job-card-body">
+  <div class="badge"><%= job.process || 'Print' %></div>
     <div class="job-card-top">
       <div class="job-name"><%= job.customer_name || 'No customer' %></div>
       <div class="job-badge <%= (job.approval_status || 'waiting').toLowerCase().replace(/\s+/g,'-') %>">
