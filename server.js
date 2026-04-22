@@ -113,33 +113,38 @@ app.post('/jobs/:id/send-approval', requireLogin, async (req, res) => {
     if (!job) return res.status(404).send('Job not found');
 
     if (!job.customer_email || !job.customer_email.includes('@')) {
-      return res.status(400).send('Customer email missing');
+      return res.status(400).send('Customer email missing or invalid');
     }
 
     const approvalLink = `${process.env.BASE_URL}/approve/${job.id}`;
 
     const html = `
-      <h2>Zander Ink Approval</h2>
-      <p>Please review your mockup:</p>
-      ${job.mockup ? `<img src="${process.env.BASE_URL}${job.mockup}" style="max-width:400px;">` : ''}
-      <p><strong>${job.customer_name}</strong></p>
-      <p><a href="${approvalLink}">Approve Here</a></p>
+      <h2>${process.env.SHOP_NAME || 'Zander Ink'} Mockup Approval</h2>
+      <p>Please review your mockup below.</p>
+      ${job.mockup ? `<p><img src="${process.env.BASE_URL}${job.mockup}" style="max-width:400px;"></p>` : ''}
+      <p><strong>Customer:</strong> ${job.customer_name || '-'}</p>
+      <p><strong>Garment:</strong> ${job.garment || '-'}</p>
+      <p><strong>Garment Color:</strong> ${job.garment_color || '-'}</p>
+      <p><strong>Print Locations:</strong> ${job.print_locations || '-'}</p>
+      <p><strong>Imprint Colors:</strong> ${job.imprint_colors || '-'}</p>
+      <p><strong>Total Price:</strong> ${job.total_price || '-'}</p>
+      <p><a href="${approvalLink}">Approve or Request Changes</a></p>
     `;
 
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: job.customer_email,
-      subject: 'Mockup Approval',
+      subject: `${process.env.SHOP_NAME || 'Zander Ink'} mockup approval`,
       html
     });
 
-    job.status = 'sent';
+    job.status = 'Sent';
     saveJobs(jobs);
 
-    res.redirect(`/jobs/${job.id}`);
+    return res.redirect(`/jobs/${job.id}`);
   } catch (err) {
-    console.log(err);
-    res.send('Email failed — check logs');
+    console.error('EMAIL SEND ERROR:', err);
+    return res.status(500).send(`Email failed: ${err.message}`);
   }
 });
 
