@@ -256,11 +256,12 @@ label{
 
 .board-card{
   background:#fff;
-  padding:12px;
-  margin-bottom:12px;
-  border-radius:10px;
-  box-shadow:var(--shadow);
-  cursor:grab;
+  border-radius:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  overflow:hidden;
+  margin:0 auto 10px auto;
+  border:1px solid #e5e7eb;
+  width:200px;
 }
 
 .board-card.dragging{
