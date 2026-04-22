@@ -86,7 +86,7 @@ app.post('/jobs', requireLogin, upload.single('mockup'), (req, res) => {
   const job = {
     id: uuidv4(),
     ...req.body,
-    mockup: req.file ? `/uploads/${req.file.filename}` : null,
+    mockup: req.file ? `/public/uploads/${req.file.filename}` : null,
     status: 'pending'
   };
 
