@@ -30,7 +30,7 @@
       </div>
     <% } else { %>
       <div class="job-grid">
-        <% jobs.forEach(job => { %>
+        <% jobs.slice().reverse().forEach(job => { %>
           <a class="job-card" href="/jobs/<%= job.id %>">
             <div class="job-card-top">
               <strong><%= job.customer_name || 'No customer' %></strong>
@@ -38,7 +38,7 @@
             </div>
             <div class="muted"><%= job.company_name || '' %></div>
             <div><%= job.garment || '' %></div>
-            <div><%= job.total_quantity || '' %> pcs</div>
+            <div><%= job.total_price || '' %></div>
             <div class="approval-tag <%= (job.approval_status || 'waiting').toLowerCase().replace(/\s+/g,'-') %>">
               <%= job.approval_status || 'Waiting' %>
             </div>
