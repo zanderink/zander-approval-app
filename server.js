@@ -21,8 +21,6 @@ const pool = new Pool({
 });
 });
  
-// 👇 ADD THIS RIGHT HERE
-
 pool.query(`
 CREATE TABLE IF NOT EXISTS jobs (
   id TEXT PRIMARY KEY,
