@@ -240,12 +240,15 @@ label{
 }
 
 .column{
-  flex:1;
+  flex-shrink:0;
   min-width:240px;
+  max-width:240px;
   background:#e5e7eb;
   border-radius:12px;
-  padding:14px;
-  min-height:500px;
+  padding:12px;
+  min-height:220px;
+  max-height:420px;
+  overflow-y:auto;
 }
 
 .column h3{
