@@ -520,3 +520,11 @@ label{
   color:#667085;
   margin-bottom:6px;
 }
+textarea{
+  width:100%;
+  padding:12px;
+  font-size:16px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  resize:vertical;
+}
