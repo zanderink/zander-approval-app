@@ -423,3 +423,27 @@ label{
 .open-btn:hover{
   background:#333;
 }
+/* STATUS COLOR BARS */
+.board-card{
+  border-top:5px solid #ddd;
+}
+
+.board-card[data-status="Pending Approval"]{
+  border-top-color:#f59e0b;
+}
+
+.board-card[data-status="Changes Requested"]{
+  border-top-color:#ef4444;
+}
+
+.board-card[data-status="Approved"]{
+  border-top-color:#22c55e;
+}
+
+.board-card[data-status="In Production"]{
+  border-top-color:#3b82f6;
+}
+
+.board-card[data-status="Completed"]{
+  border-top-color:#6b7280;
+}
