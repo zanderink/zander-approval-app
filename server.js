@@ -1,78 +1,52 @@
-require('dotenv').config();
 const express = require('express');
-const session = require('express-session');
-const nodemailer = require('nodemailer');
+const bodyParser = require('body-parser');
 const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
 const path = require('path');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
+const session = require('express-session');
+const { v4: uuidv4 } = require('uuid');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-app.use('/public', express.static(path.join(__dirname, 'public')));
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || 'secret',
-    resave: false,
-    saveUninitialized: false
-  })
-);
+app.use(session({
+  secret: 'zander-secret',
+  resave: false,
+  saveUninitialized: true
+}));
 
-const uploadDir = path.join(__dirname, 'public', 'uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+// Upload setup
+const upload = multer({ dest: 'public/uploads/' });
 
-const storage = multer.diskStorage({
-  destination: (_, __, cb) => cb(null, uploadDir),
-  filename: (_, file, cb) => {
-    const safeName = `${Date.now()}-${file.originalname.replace(/\s+/g, '-')}`;
-    cb(null, safeName);
-  }
-});
-const upload = multer({ storage });
-
-const dataFile = path.join(__dirname, 'jobs.json');
+// Simple file DB
+const DATA_FILE = 'jobs.json';
 
 function getJobs() {
-  if (!fs.existsSync(dataFile)) return [];
-  try {
-    return JSON.parse(fs.readFileSync(dataFile, 'utf8'));
-  } catch {
-    return [];
-  }
+  if (!fs.existsSync(DATA_FILE)) return [];
+  return JSON.parse(fs.readFileSync(DATA_FILE));
 }
 
 function saveJobs(jobs) {
-  fs.writeFileSync(dataFile, JSON.stringify(jobs, null, 2));
+  fs.writeFileSync(DATA_FILE, JSON.stringify(jobs, null, 2));
 }
 
-function requireLogin(req, res, next) {
-  if (!req.session.loggedIn) return res.redirect('/login');
-  next();
-}
-
+// Email setup (leave blank for now if needed)
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT || 587),
-  secure: false,
+  service: 'gmail',
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
   }
 });
 
-app.get('/', requireLogin, (req, res) => {
-  const jobs = getJobs().reverse();
-  res.render('dashboard', { jobs });
-});
-
+// LOGIN
 app.get('/login', (req, res) => {
   res.render('login');
 });
@@ -85,66 +59,35 @@ app.post('/login', (req, res) => {
     req.session.loggedIn = true;
     return res.redirect('/');
   }
-  res.status(401).send('Login failed');
+  res.send('Login failed');
 });
 
-app.get('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/login');
-  });
+// AUTH MIDDLEWARE
+function requireLogin(req, res, next) {
+  if (!req.session.loggedIn) return res.redirect('/login');
+  next();
+}
+
+// DASHBOARD
+app.get('/', requireLogin, (req, res) => {
+  const jobs = getJobs();
+  res.render('dashboard', { jobs });
 });
 
+// NEW JOB PAGE
 app.get('/jobs/new', requireLogin, (req, res) => {
-  res.render('new-job', {
-    garmentOptions: ['Shirt', 'Long Sleeve', 'Hoodie', 'Jacket', 'Polo', '1/4 Zip'],
-    garmentColorOptions: [
-      'Black',
-      'White',
-      'Sport Grey',
-      'Dark Heather',
-      'Red',
-      'Maroon',
-      'Royal',
-      'Navy',
-      'Carolina Blue',
-      'Forest Green',
-      'Orange',
-      'Purple',
-      'Gold',
-      'Sand'
-    ],
-    processOptions: ['Screen Print', 'Embroidery', 'Direct to Film'],
-    printLocationOptions: [
-      'Front Left Chest',
-      'Front Left Chest / Back',
-      'Full Front',
-      'Full Front / Full Back',
-      'Sleeve'
-    ],
-    sizeOrder: ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL']
-  });
+  res.render('new-job');
 });
 
+// CREATE JOB
 app.post('/jobs', requireLogin, upload.single('mockup'), (req, res) => {
   const jobs = getJobs();
 
   const job = {
     id: uuidv4(),
-    created_at: new Date().toISOString(),
-    customer_name: req.body.customer_name || '',
-    company_name: req.body.company_name || '',
-    customer_email: req.body.customer_email || '',
-    garment: req.body.garment || '',
-    garment_color: req.body.garment_color || '',
-    imprint_colors: req.body.imprint_colors || '',
-    print_locations: req.body.print_locations || '',
-    total_sizes: req.body.total_sizes || '',
-    total_quantity: req.body.total_quantity || '',
-    total_price: req.body.total_price || '',
-    notes: req.body.notes || '',
-    status: 'Pending Approval',
-    approval_status: 'Waiting',
-    mockup: req.file ? `/public/uploads/${req.file.filename}` : ''
+    ...req.body,
+    mockup: req.file ? `/uploads/${req.file.filename}` : null,
+    status: 'pending'
   };
 
   jobs.push(job);
@@ -153,13 +96,16 @@ app.post('/jobs', requireLogin, upload.single('mockup'), (req, res) => {
   res.redirect('/');
 });
 
+// JOB DETAIL
 app.get('/jobs/:id', requireLogin, (req, res) => {
   const jobs = getJobs();
   const job = jobs.find(j => j.id === req.params.id);
-  if (!job) return res.status(404).send('Job not found');
+  if (!job) return res.send('Not found');
+
   res.render('job-detail', { job });
 });
 
+// SEND APPROVAL (FIXED)
 app.post('/jobs/:id/send-approval', requireLogin, async (req, res) => {
   try {
     const jobs = getJobs();
@@ -167,78 +113,45 @@ app.post('/jobs/:id/send-approval', requireLogin, async (req, res) => {
     if (!job) return res.status(404).send('Job not found');
 
     if (!job.customer_email || !job.customer_email.includes('@')) {
-      return res.status(400).send('Customer email missing or invalid');
+      return res.status(400).send('Customer email missing');
     }
 
     const approvalLink = `${process.env.BASE_URL}/approve/${job.id}`;
 
     const html = `
-      <h2>${process.env.SHOP_NAME || 'Zander Ink'} Mockup Approval</h2>
-      <p>Please review your mockup below.</p>
-      ${job.mockup ? `<p><img src="${process.env.BASE_URL}${job.mockup}" style="max-width:400px;"></p>` : ''}
-      <p><strong>Customer:</strong> ${job.customer_name || '-'}</p>
-      <p><strong>Garment:</strong> ${job.garment || '-'}</p>
-      <p><strong>Garment Color:</strong> ${job.garment_color || '-'}</p>
-      <p><strong>Print Locations:</strong> ${job.print_locations || '-'}</p>
-      <p><strong>Imprint Colors:</strong> ${job.imprint_colors || '-'}</p>
-      <p><strong>Total Sizes:</strong> ${job.total_sizes || '-'}</p>
-      <p><strong>Total Quantity:</strong> ${job.total_quantity || '-'}</p>
-      <p><strong>Total Price:</strong> ${job.total_price || '-'}</p>
-      <p><a href="${approvalLink}">Approve or Request Changes</a></p>
+      <h2>Zander Ink Approval</h2>
+      <p>Please review your mockup:</p>
+      ${job.mockup ? `<img src="${process.env.BASE_URL}${job.mockup}" style="max-width:400px;">` : ''}
+      <p><strong>${job.customer_name}</strong></p>
+      <p><a href="${approvalLink}">Approve Here</a></p>
     `;
 
     await transporter.sendMail({
       from: process.env.SMTP_USER,
       to: job.customer_email,
-      subject: `${process.env.SHOP_NAME || 'Zander Ink'} mockup approval`,
+      subject: 'Mockup Approval',
       html
     });
 
-    job.status = 'Sent';
+    job.status = 'sent';
     saveJobs(jobs);
 
     res.redirect(`/jobs/${job.id}`);
   } catch (err) {
-    console.error('EMAIL SEND ERROR:', err);
-    res.status(500).send(`Email failed: ${err.message}`);
+    console.log(err);
+    res.send('Email failed — check logs');
   }
 });
 
-  job.status = 'Sent';
-  saveJobs(jobs);
-
-  res.redirect(`/jobs/${job.id}`);
-});
-
+// APPROVAL PAGE
 app.get('/approve/:id', (req, res) => {
   const jobs = getJobs();
   const job = jobs.find(j => j.id === req.params.id);
-  if (!job) return res.status(404).send('Job not found');
+  if (!job) return res.send('Not found');
+
   res.render('customer-approval', { job });
 });
 
-app.post('/approve/:id', (req, res) => {
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === req.params.id);
-  if (!job) return res.status(404).send('Job not found');
-
-  const action = req.body.action;
-  const customer_notes = req.body.customer_notes || '';
-
-  if (action === 'approve') {
-    job.approval_status = 'APPROVED';
-    job.status = 'Ready for Production';
-  } else {
-    job.approval_status = 'REQUEST CHANGES';
-    job.status = 'Changes Requested';
-  }
-
-  job.customer_notes = customer_notes;
-  saveJobs(jobs);
-
-  res.render('approval-result', { job });
-});
-
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on ${PORT}`);
 });
