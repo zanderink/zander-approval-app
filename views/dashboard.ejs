@@ -25,7 +25,7 @@
       <div class="column" data-status="<%= column %>">
         <h3><%= column %></h3>
 
-        <% jobs
+         <% jobs
          .filter(j => (j.status || '').trim() === column.trim())
           .forEach(job => { %>
       data-status="<%= job.status %>"
