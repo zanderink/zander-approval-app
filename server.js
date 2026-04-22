@@ -19,6 +19,55 @@ const pool = new Pool({
     ? { rejectUnauthorized: false }
     : false
 });
+async function getAllJobsDB() {
+  const result = await pool.query('SELECT * FROM jobs ORDER BY created_at DESC');
+  return result.rows;
+}
+
+async function getJobByIdDB(id) {
+  const result = await pool.query('SELECT * FROM jobs WHERE id = $1', [id]);
+  return result.rows[0];
+}
+
+async function createJobDB(job) {
+  await pool.query(`
+    INSERT INTO jobs (
+      id, customer_name, company_name, customer_email,
+      garment, garment_color, process, print_locations,
+      imprint_colors, total_sizes, total_quantity, total_price,
+      due_date, po_number, rush_order, fulfillment, shipping_address,
+      notes, mockup, status, approval_status, customer_notes, created_at
+    )
+    VALUES (
+      $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,
+      $13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23
+    )
+  `, [
+    job.id,
+    job.customer_name,
+    job.company_name,
+    job.customer_email,
+    job.garment,
+    job.garment_color,
+    job.process,
+    job.print_locations,
+    job.imprint_colors,
+    job.total_sizes,
+    job.total_quantity,
+    job.total_price,
+    job.due_date,
+    job.po_number,
+    job.rush_order,
+    job.fulfillment,
+    job.shipping_address,
+    job.notes,
+    job.mockup,
+    job.status,
+    job.approval_status,
+    job.customer_notes,
+    job.created_at
+  ]);
+}
 /* =========================
    APP SETUP
 ========================= */
