@@ -341,3 +341,38 @@ label{
   border-radius: 6px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
+.board {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  align-items: flex-start;
+}
+
+.column {
+  flex: 1;
+  background: #f4f4f4;
+  padding: 10px;
+  border-radius: 8px;
+  min-height: 400px;
+}
+
+.column h3 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.card {
+  background: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.board-card {
+  cursor: grab;
+}
+
+.board-card.dragging {
+  opacity: 0.5;
+}
