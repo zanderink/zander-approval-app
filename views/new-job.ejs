@@ -238,5 +238,19 @@
 
     document.querySelectorAll('.dynamic-row').forEach(wireDynamicCustom);
   </script>
+<script>
+  const fulfillmentSelect = document.getElementById('fulfillment_select');
+  const shippingWrap = document.getElementById('shipping_address_wrap');
+
+  function toggleShippingAddress() {
+    if (!fulfillmentSelect || !shippingWrap) return;
+    shippingWrap.style.display = fulfillmentSelect.value === 'Ship' ? 'block' : 'none';
+  }
+
+  if (fulfillmentSelect) {
+    fulfillmentSelect.addEventListener('change', toggleShippingAddress);
+    toggleShippingAddress();
+  }
+</script>
 </body>
 </html>
