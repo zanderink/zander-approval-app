@@ -29,17 +29,18 @@
   .filter(j => (j.status || '').trim() === column.trim())
   .forEach(job => { %>
 
-  <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status %>">
+<div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status %>">
+
   <% if (job.mockup) { %>
-    <img
-  src="<%= job.mockup %>"
-  alt="Mockup"
-  class="job-thumb preview-img"
-  onclick="openPreview('<%= job.mockup %>', '<%= job.customer_name || 'No customer' %>', '<%= job.process || 'Print' %>', '<%= job.total_price || '' %>', '/jobs/<%= job.id %>')"
->
-  <% } else { %>
-    <div class="job-thumb job-thumb-placeholder">No Preview</div>
-  <% } %>
+  <img
+    src="<%= job.mockup %>"
+    alt="Mockup"
+    class="job-thumb preview-img"
+    onclick="openPreview('<%= job.mockup %>', '<%= job.customer_name || 'No customer' %>', '<%= job.process || 'Print' %>', '<%= job.total_price || '' %>', '/jobs/<%= job.id %>')"
+  >
+<% } else { %>
+  <div class="job-thumb job-thumb-placeholder">No Preview</div>
+<% } %>
 
   <div class="badge"><%= job.process || 'Print' %></div>
     <div class="job-card-top">
