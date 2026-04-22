@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const multer = require('multer');
@@ -6,6 +8,7 @@ const fs = require('fs');
 const nodemailer = require('nodemailer');
 const session = require('express-session');
 const { v4: uuidv4 } = require('uuid');
+const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,29 +18,58 @@ app.set('views', path.join(__dirname, 'views'));
 
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use(session({
-  secret: 'zander-secret',
+  secret: process.env.SESSION_SECRET || 'zander-secret',
   resave: false,
   saveUninitialized: true
 }));
 
-// Upload setup
-const upload = multer({ dest: 'public/uploads/' });
-
-// Simple file DB
-const DATA_FILE = 'jobs.json';
-
-function getJobs() {
-  if (!fs.existsSync(DATA_FILE)) return [];
-  return JSON.parse(fs.readFileSync(DATA_FILE));
+const uploadDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-function saveJobs(jobs) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(jobs, null, 2));
+const upload = multer({ dest: uploadDir });
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('render.com')
+    ? { rejectUnauthorized: false }
+    : false
+});
+
+async function initDb() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS jobs (
+      id TEXT PRIMARY KEY,
+      customer_name TEXT,
+      company_name TEXT,
+      customer_email TEXT,
+      garment TEXT,
+      garment_color TEXT,
+      process TEXT,
+      print_locations TEXT,
+      imprint_colors TEXT,
+      total_sizes TEXT,
+      total_quantity TEXT,
+      total_price TEXT,
+      notes TEXT,
+      mockup TEXT,
+      status TEXT DEFAULT 'Pending Approval',
+      approval_status TEXT DEFAULT 'Waiting',
+      customer_notes TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )
+  `);
 }
 
-// Email setup (leave blank for now if needed)
+function requireLogin(req, res, next) {
+  if (!req.session.loggedIn) return res.redirect('/login');
+  next();
+}
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -46,7 +78,16 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// LOGIN
+async function getJobs() {
+  const result = await pool.query('SELECT * FROM jobs ORDER BY created_at DESC');
+  return result.rows;
+}
+
+async function getJobById(id) {
+  const result = await pool.query('SELECT * FROM jobs WHERE id = $1 LIMIT 1', [id]);
+  return result.rows[0] || null;
+}
+
 app.get('/login', (req, res) => {
   res.render('login');
 });
@@ -59,57 +100,187 @@ app.post('/login', (req, res) => {
     req.session.loggedIn = true;
     return res.redirect('/');
   }
-  res.send('Login failed');
+  res.status(401).send('Login failed');
 });
 
-// AUTH MIDDLEWARE
-function requireLogin(req, res, next) {
-  if (!req.session.loggedIn) return res.redirect('/login');
-  next();
-}
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
+  });
+});
 
-// DASHBOARD
-app.get('/', requireLogin, (req, res) => {
-  const jobs = getJobs();
+app.get('/', requireLogin, async (req, res) => {
+  const jobs = await getJobs();
   res.render('dashboard', { jobs });
 });
 
-// NEW JOB PAGE
 app.get('/jobs/new', requireLogin, (req, res) => {
   res.render('new-job');
 });
 
-// CREATE JOB
-app.post('/jobs', requireLogin, upload.single('mockup'), (req, res) => {
-  const jobs = getJobs();
+app.post('/jobs', requireLogin, upload.single('mockup'), async (req, res) => {
+  const id = uuidv4();
 
-  const job = {
-    id: uuidv4(),
-    ...req.body,
-    mockup: req.file ? `/public/uploads/${req.file.filename}` : null,
-    status: 'pending'
-  };
+  const sizeParts = [];
+  const sizeMap = [
+    ['S', req.body.size_s],
+    ['M', req.body.size_m],
+    ['L', req.body.size_l],
+    ['XL', req.body.size_xl],
+    ['2XL', req.body.size_2xl],
+    ['3XL', req.body.size_3xl],
+    ['4XL', req.body.size_4xl],
+    ['5XL', req.body.size_5xl]
+  ];
 
-  jobs.push(job);
-  saveJobs(jobs);
+  for (const [label, value] of sizeMap) {
+    if (value && String(value).trim() !== '' && String(value) !== '0') {
+      sizeParts.push(`${label}: ${value}`);
+    }
+  }
+
+  const totalSizes = sizeParts.join(', ');
+  const totalQuantity = sizeMap.reduce((sum, [, value]) => {
+    const n = parseInt(value || '0', 10);
+    return sum + (Number.isNaN(n) ? 0 : n);
+  }, 0);
+
+  const printLocations =
+    req.body.print_locations ||
+    Object.keys(req.body)
+      .filter(k => k.startsWith('print_location_') && !k.startsWith('print_location_custom_'))
+      .map(k => {
+        const val = req.body[k];
+        if (val === '__custom__') {
+          const idx = k.split('_').pop();
+          return req.body[`print_location_custom_${idx}`] || '';
+        }
+        return val || '';
+      })
+      .filter(Boolean)
+      .join(' / ');
+
+  const garmentColor =
+    req.body.garment_color === '__custom__'
+      ? (req.body.garment_color_custom || '')
+      : (req.body.garment_color || '');
+
+  const mockup = req.file ? `/public/uploads/${req.file.filename}` : null;
+
+  await pool.query(
+    `INSERT INTO jobs (
+      id, customer_name, company_name, customer_email,
+      garment, garment_color, process, print_locations,
+      imprint_colors, total_sizes, total_quantity, total_price,
+      notes, mockup, status, approval_status
+    ) VALUES (
+      $1,$2,$3,$4,
+      $5,$6,$7,$8,
+      $9,$10,$11,$12,
+      $13,$14,$15,$16
+    )`,
+    [
+      id,
+      req.body.customer_name || '',
+      req.body.company_name || '',
+      req.body.customer_email || '',
+      req.body.garment || '',
+      garmentColor,
+      req.body.process || '',
+      printLocations || '',
+      req.body.imprint_colors || '',
+      totalSizes || '',
+      String(totalQuantity || ''),
+      req.body.total_price || '',
+      req.body.notes || '',
+      mockup,
+      'Pending Approval',
+      'Waiting'
+    ]
+  );
 
   res.redirect('/');
 });
 
-// JOB DETAIL
-app.get('/jobs/:id', requireLogin, (req, res) => {
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === req.params.id);
-  if (!job) return res.send('Not found');
-
+app.get('/jobs/:id', requireLogin, async (req, res) => {
+  const job = await getJobById(req.params.id);
+  if (!job) return res.status(404).send('Job not found');
   res.render('job-detail', { job });
 });
 
-// SEND APPROVAL (FIXED)
+app.get('/jobs/:id/edit', requireLogin, async (req, res) => {
+  const job = await getJobById(req.params.id);
+  if (!job) return res.status(404).send('Job not found');
+  res.render('edit-job', { job });
+});
+
+app.post('/jobs/:id/edit', requireLogin, upload.single('mockup'), async (req, res) => {
+  const job = await getJobById(req.params.id);
+  if (!job) return res.status(404).send('Job not found');
+
+  let mockup = job.mockup;
+  if (req.file) {
+    mockup = `/public/uploads/${req.file.filename}`;
+  }
+
+  await pool.query(
+    `UPDATE jobs SET
+      customer_name = $1,
+      company_name = $2,
+      customer_email = $3,
+      garment = $4,
+      garment_color = $5,
+      process = $6,
+      print_locations = $7,
+      imprint_colors = $8,
+      total_sizes = $9,
+      total_quantity = $10,
+      total_price = $11,
+      notes = $12,
+      mockup = $13
+    WHERE id = $14`,
+    [
+      req.body.customer_name || '',
+      req.body.company_name || '',
+      req.body.customer_email || '',
+      req.body.garment || '',
+      req.body.garment_color || '',
+      req.body.process || '',
+      req.body.print_locations || '',
+      req.body.imprint_colors || '',
+      req.body.total_sizes || '',
+      req.body.total_quantity || '',
+      req.body.total_price || '',
+      req.body.notes || '',
+      mockup,
+      req.params.id
+    ]
+  );
+
+  res.redirect(`/jobs/${req.params.id}`);
+});
+
+app.post('/jobs/:id/status', requireLogin, async (req, res) => {
+  const job = await getJobById(req.params.id);
+  if (!job) return res.status(404).send('Job not found');
+
+  const status = req.body.status || job.status;
+  let approvalStatus = job.approval_status;
+
+  if (status === 'Approved') approvalStatus = 'APPROVED';
+  if (status === 'Changes Requested') approvalStatus = 'REQUEST CHANGES';
+
+  await pool.query(
+    'UPDATE jobs SET status = $1, approval_status = $2 WHERE id = $3',
+    [status, approvalStatus, req.params.id]
+  );
+
+  res.redirect(`/jobs/${req.params.id}`);
+});
+
 app.post('/jobs/:id/send-approval', requireLogin, async (req, res) => {
   try {
-    const jobs = getJobs();
-    const job = jobs.find(j => j.id === req.params.id);
+    const job = await getJobById(req.params.id);
     if (!job) return res.status(404).send('Job not found');
 
     if (!job.customer_email || !job.customer_email.includes('@')) {
@@ -137,81 +308,71 @@ app.post('/jobs/:id/send-approval', requireLogin, async (req, res) => {
       subject: `${process.env.SHOP_NAME || 'Zander Ink'} mockup approval`,
       html
     });
-app.get('/jobs/:id/edit', requireLogin, (req, res) => {
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === req.params.id);
-  if (!job) return res.status(404).send('Job not found');
 
-  res.render('edit-job', { job });
-});
+    await pool.query('UPDATE jobs SET status = $1 WHERE id = $2', ['Sent', job.id]);
 
-app.post('/jobs/:id/edit', requireLogin, upload.single('mockup'), (req, res) => {
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === req.params.id);
-  if (!job) return res.status(404).send('Job not found');
-
-  Object.assign(job, req.body);
-
-  if (req.file) {
-    job.mockup = `/public/uploads/${req.file.filename}`;
-  }
-
-  saveJobs(jobs);
-  res.redirect(`/jobs/${job.id}`);
-});
-
-app.post('/jobs/:id/status', requireLogin, (req, res) => {
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === req.params.id);
-  if (!job) return res.status(404).send('Job not found');
-
-  job.status = req.body.status;
-  saveJobs(jobs);
-
-  res.redirect(`/jobs/${job.id}`);
-});
-    job.status = 'Sent';
-    saveJobs(jobs);
-
-    return res.redirect(`/jobs/${job.id}`);
+    res.redirect(`/jobs/${job.id}`);
   } catch (err) {
     console.error('EMAIL SEND ERROR:', err);
-    return res.status(500).send(`Email failed: ${err.message}`);
+    res.status(500).send(`Email failed: ${err.message}`);
   }
 });
 
-// APPROVAL PAGE
-app.get('/approve/:id', (req, res) => {
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === req.params.id);
-  if (!job) return res.send('Not found');
-
+app.get('/approve/:id', async (req, res) => {
+  const job = await getJobById(req.params.id);
+  if (!job) return res.status(404).send('Job not found');
   res.render('customer-approval', { job });
 });
-app.post('/approve/:id', (req, res) => {
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === req.params.id);
 
-  if (!job) {
-    return res.status(404).send('Job not found');
-  }
+app.post('/approve/:id', async (req, res) => {
+  const job = await getJobById(req.params.id);
+  if (!job) return res.status(404).send('Job not found');
 
   const action = req.body.action;
   const customerNotes = req.body.customer_notes || '';
 
+  let approvalStatus = 'REQUEST CHANGES';
+  let status = 'Changes Requested';
+
   if (action === 'approve') {
-    job.approval_status = 'APPROVED';
-    job.status = 'Ready for Production';
-  } else {
-    job.approval_status = 'REQUEST CHANGES';
-    job.status = 'Changes Requested';
+    approvalStatus = 'APPROVED';
+    status = 'Approved';
   }
 
-  job.customer_notes = customerNotes;
-  saveJobs(jobs);
+  await pool.query(
+    'UPDATE jobs SET approval_status = $1, status = $2, customer_notes = $3 WHERE id = $4',
+    [approvalStatus, status, customerNotes, req.params.id]
+  );
 
-  res.render('approval-result', { job });
+  const updatedJob = await getJobById(req.params.id);
+  res.render('approval-result', { job: updatedJob });
 });
-app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
+
+app.post('/jobs/:id/move', requireLogin, async (req, res) => {
+  const job = await getJobById(req.params.id);
+  if (!job) return res.status(404).json({ ok: false });
+
+  const status = req.body.status || 'Pending Approval';
+  let approvalStatus = job.approval_status;
+
+  if (status === 'Approved') approvalStatus = 'APPROVED';
+  if (status === 'Changes Requested') approvalStatus = 'REQUEST CHANGES';
+
+  await pool.query(
+    'UPDATE jobs SET status = $1, approval_status = $2 WHERE id = $3',
+    [status, approvalStatus, req.params.id]
+  );
+
+  res.json({ ok: true });
 });
+
+initDb()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on ${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('DB INIT ERROR:', err);
+    process.exit(1);
+  });
