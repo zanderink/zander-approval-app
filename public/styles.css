@@ -1,56 +1,81 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f4f6f8;
+  background: #f3f4f6;
   margin: 0;
+  color: #111827;
 }
 
 h1 {
-  padding: 20px;
   margin: 0;
+  padding: 24px 24px 8px 24px;
+  font-size: 36px;
 }
 
-a {
+.top-links {
+  padding: 0 24px 16px 24px;
+}
+
+.top-links a {
+  color: #111827;
   text-decoration: none;
+  font-weight: 600;
+}
+
+.top-links a:hover {
+  text-decoration: underline;
 }
 
 .board {
   display: flex;
-  gap: 20px;
-  padding: 20px;
+  gap: 18px;
+  padding: 20px 24px 30px 24px;
+  align-items: flex-start;
 }
 
 .column {
   flex: 1;
-  background: #e3e7eb;
-  border-radius: 8px;
-  padding: 10px;
+  background: #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
   min-height: 500px;
 }
 
-.column h2 {
+.column h3 {
+  margin: 0 0 14px 0;
   text-align: center;
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .card {
-  background: white;
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 6px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  background: #ffffff;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.board-card {
   cursor: grab;
+}
+
+.board-card.dragging {
+  opacity: 0.5;
 }
 
 .card strong {
   display: block;
+  font-size: 18px;
+  margin-bottom: 4px;
 }
 
-.btn {
+.card a {
   display: inline-block;
-  padding: 6px 10px;
-  background: black;
-  color: white;
-  border-radius: 4px;
-  font-size: 12px;
-  margin-top: 5px;
+  margin-top: 8px;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.card a:hover {
+  text-decoration: underline;
 }
