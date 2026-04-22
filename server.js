@@ -257,7 +257,23 @@ app.post('/jobs/:id/status', requireLogin, async (req, res) => {
 
   res.redirect(`/jobs/${req.params.id}`);
 });
+app.post('/jobs/:id/move', requireLogin, async (req, res) => {
+  const job = await getJobById(req.params.id);
+  if (!job) return res.status(404).json({ ok: false });
 
+  const status = req.body.status || 'Pending Approval';
+  let approvalStatus = job.approval_status;
+
+  if (status === 'Approved') approvalStatus = 'APPROVED';
+  if (status === 'Changes Requested') approvalStatus = 'REQUEST CHANGES';
+
+  await pool.query(
+    'UPDATE jobs SET status = $1, approval_status = $2 WHERE id = $3',
+    [status, approvalStatus, req.params.id]
+  );
+
+  res.json({ ok: true });
+});
 app.post('/jobs/:id/send-approval', requireLogin, async (req, res) => {
   try {
     const job = await getJobById(req.params.id);
