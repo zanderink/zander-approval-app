@@ -226,6 +226,7 @@ const job = {
   po_number: req.body.po_number || '',
   rush_order: req.body.rush_order || 'No',
   fulfillment: req.body.fulfillment || '',
+   shipping_address: req.body.shipping_address || '',
   notes: req.body.notes || '',
   mockup: req.file ? `/public/uploads/${req.file.filename}` : null,
   status: 'Pending Approval',
