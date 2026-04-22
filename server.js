@@ -477,9 +477,8 @@ app.get('/approve/:id', (req, res) => {
   res.render('customer-approval', { job });
 });
 
-app.post('/approve/:id', (req, res) => {
-  const jobs = getJobs();
-  const job = jobs.find(j => j.id === req.params.id);
+app.post('/approve/:id', async (req, res) => {
+  const job = await getJobByIdDB(req.params.id);
 
   if (!job) {
     return res.status(404).send('Job not found');
@@ -488,18 +487,25 @@ app.post('/approve/:id', (req, res) => {
   const action = req.body.action;
   const customerNotes = req.body.customer_notes || '';
 
+  let status = job.status;
+  let approvalStatus = job.approval_status;
+
   if (action === 'approve') {
-    job.approval_status = 'APPROVED';
-    job.status = 'Approved';
+    approvalStatus = 'APPROVED';
+    status = 'Approved';
   } else {
-    job.approval_status = 'REQUEST CHANGES';
-    job.status = 'Changes Requested';
+    approvalStatus = 'REQUEST CHANGES';
+    status = 'Changes Requested';
   }
 
-  job.customer_notes = customerNotes;
-  saveJobs(jobs);
+  await pool.query(
+    'UPDATE jobs SET status = $1, approval_status = $2, customer_notes = $3 WHERE id = $4',
+    [status, approvalStatus, customerNotes, req.params.id]
+  );
 
-  res.render('approval-result', { job });
+  const updatedJob = await getJobByIdDB(req.params.id);
+
+  res.render('approval-result', { job: updatedJob });
 });
 
 /* =========================
