@@ -11,19 +11,21 @@
     <div class="card">
       <h1 class="panel-title">Review Your Mockup</h1>
 
-      <% if (job.mockup) { %>
+      <% if (job && job.mockup) { %>
         <img src="<%= job.mockup %>" class="mockup-image" alt="Mockup">
       <% } %>
 
-      <p><strong>Garment:</strong> <%= job.garment || '-' %></p>
-      <p><strong>Garment Color:</strong> <%= job.garment_color || '-' %></p>
-      <p><strong>Print Locations:</strong> <%= job.print_locations || '-' %></p>
-      <p><strong>Imprint Colors:</strong> <%= job.imprint_colors || '-' %></p>
-      <p><strong>Total Sizes:</strong> <%= job.total_sizes || '-' %></p>
-      <p><strong>Total Price:</strong> <%= job.total_price || '-' %></p>
+      <p><strong>Customer:</strong> <%= job?.customer_name || '-' %></p>
+      <p><strong>Garment:</strong> <%= job?.garment || '-' %></p>
+      <p><strong>Garment Color:</strong> <%= job?.garment_color || '-' %></p>
+      <p><strong>Print Locations:</strong> <%= job?.print_locations || '-' %></p>
+      <p><strong>Imprint Colors:</strong> <%= job?.imprint_colors || '-' %></p>
+      <p><strong>Total Price:</strong> <%= job?.total_price || '-' %></p>
 
       <form method="POST" action="/approve/<%= job.id %>">
-        <textarea name="customer_notes" placeholder="If requesting changes, type what you want changed here"></textarea>
+        <label for="customer_notes">If you want changes, type them here:</label>
+        <textarea id="customer_notes" name="customer_notes" placeholder="Example: move the back print up, change red to royal, make left chest smaller"></textarea>
+
         <div class="button-row">
           <button class="btn btn-green" type="submit" name="action" value="approve">Approve</button>
           <button class="btn btn-red" type="submit" name="action" value="changes">Request Changes</button>
