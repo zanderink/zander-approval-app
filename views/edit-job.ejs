@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Job</title>
+  <link rel="stylesheet" href="/public/styles.css" />
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div>
+        <h1 class="brand-title">Edit Job</h1>
+        <p class="brand-subtitle">Update details, replace the mockup, and resend approval.</p>
+      </div>
+      <a class="btn btn-light" href="/jobs/<%= job.id %>">Back to Job</a>
+    </div>
+
+    <div class="card">
+      <form action="/jobs/<%= job.id %>/edit" method="POST" enctype="multipart/form-data" class="form-grid">
+
+        <div>
+          <label>Customer Name</label>
+          <input name="customer_name" value="<%= job.customer_name || '' %>" required />
+        </div>
+
+        <div>
+          <label>Company Name</label>
+          <input name="company_name" value="<%= job.company_name || '' %>" />
+        </div>
+
+        <div>
+          <label>Customer Email</label>
+          <input type="email" name="customer_email" value="<%= job.customer_email || '' %>" required />
+        </div>
+
+        <div>
+          <label>Total Price</label>
+          <input name="total_price" value="<%= job.total_price || '' %>" />
+        </div>
+
+        <div>
+          <label>Garment</label>
+          <input name="garment" value="<%= job.garment || '' %>" />
+        </div>
+
+        <div>
+          <label>Garment Color</label>
+          <input name="garment_color" value="<%= job.garment_color || '' %>" />
+        </div>
+
+        <div>
+          <label>Process</label>
+          <input name="process" value="<%= job.process || '' %>" />
+        </div>
+
+        <div>
+          <label>Print Locations</label>
+          <input name="print_locations" value="<%= job.print_locations || '' %>" />
+        </div>
+
+        <div class="full">
+          <label>Imprint Colors</label>
+          <input name="imprint_colors" value="<%= job.imprint_colors || '' %>" />
+        </div>
+
+        <div class="full">
+          <label>Total Sizes</label>
+          <input name="total_sizes" value="<%= job.total_sizes || '' %>" />
+        </div>
+
+        <div>
+          <label>Total Quantity</label>
+          <input name="total_quantity" value="<%= job.total_quantity || '' %>" />
+        </div>
+
+        <div>
+          <label>Replace Mockup Image</label>
+          <input type="file" name="mockup" accept="image/*,.pdf" />
+        </div>
+
+        <div class="full">
+          <label>Internal Notes</label>
+          <textarea name="notes"><%= job.notes || '' %></textarea>
+        </div>
+
+        <div class="full">
+          <button class="btn btn-primary" type="submit">Save Changes</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</body>
+</html>
