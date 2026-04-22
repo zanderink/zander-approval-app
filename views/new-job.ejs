@@ -54,7 +54,30 @@
 
         <div>
           <label>Garment Color</label>
-          <input name="garment_color" placeholder="Black, White, Red..." />
+          <select name="garment_color" id="garment_color_select">
+            <option value="">Select color</option>
+            <option>Black</option>
+            <option>White</option>
+            <option>Sport Grey</option>
+            <option>Dark Heather</option>
+            <option>Red</option>
+            <option>Maroon</option>
+            <option>Royal</option>
+            <option>Navy</option>
+            <option>Carolina Blue</option>
+            <option>Forest Green</option>
+            <option>Orange</option>
+            <option>Purple</option>
+            <option>Gold</option>
+            <option>Sand</option>
+            <option value="__custom__">Other / Custom Color</option>
+          </select>
+          <input
+            name="garment_color_custom"
+            id="garment_color_custom"
+            placeholder="Type custom garment color"
+            style="margin-top:8px;display:none;"
+          />
         </div>
 
         <div>
@@ -67,9 +90,28 @@
           </select>
         </div>
 
-        <div>
+        <div class="full">
           <label>Print Locations</label>
-          <input name="print_locations" placeholder="Front Left Chest / Back / Sleeve" />
+          <div id="printLocationRows">
+            <div class="dynamic-row">
+              <select name="print_location_0" class="dynamic-select print-location-select">
+                <option value="">Select print location</option>
+                <option>Front Left Chest</option>
+                <option>Front Left Chest / Back</option>
+                <option>Full Front</option>
+                <option>Full Front / Full Back</option>
+                <option>Sleeve</option>
+                <option value="__custom__">Other / Custom</option>
+              </select>
+              <input
+                name="print_location_custom_0"
+                class="dynamic-custom-input"
+                placeholder="Type custom print location"
+              />
+              <span></span>
+            </div>
+          </div>
+          <button class="btn btn-light" type="button" id="addLocationBtn">Add Another Location</button>
         </div>
 
         <div class="full">
@@ -108,5 +150,68 @@
       </form>
     </div>
   </div>
+
+  <script>
+    function wireDynamicCustom(row) {
+      const select = row.querySelector('select');
+      const input = row.querySelector('.dynamic-custom-input');
+      if (!select || !input) return;
+
+      const sync = () => {
+        const show = select.value === '__custom__';
+        input.style.display = show ? 'block' : 'none';
+        if (!show) input.value = '';
+      };
+
+      select.addEventListener('change', sync);
+      sync();
+    }
+
+    function addDynamicRow() {
+      const container = document.getElementById('printLocationRows');
+      const index = container.querySelectorAll('.dynamic-row').length;
+
+      const row = document.createElement('div');
+      row.className = 'dynamic-row';
+
+      row.innerHTML = `
+        <select name="print_location_${index}" class="dynamic-select print-location-select">
+          <option value="">Select print location</option>
+          <option>Front Left Chest</option>
+          <option>Front Left Chest / Back</option>
+          <option>Full Front</option>
+          <option>Full Front / Full Back</option>
+          <option>Sleeve</option>
+          <option value="__custom__">Other / Custom</option>
+        </select>
+        <input
+          name="print_location_custom_${index}"
+          class="dynamic-custom-input"
+          placeholder="Type custom print location"
+        />
+        <button type="button" class="btn btn-light" onclick="this.parentElement.remove()">Remove</button>
+      `;
+
+      container.appendChild(row);
+      wireDynamicCustom(row);
+    }
+
+    document.getElementById('addLocationBtn')?.addEventListener('click', addDynamicRow);
+
+    const garmentColorSelect = document.getElementById('garment_color_select');
+    const garmentColorCustom = document.getElementById('garment_color_custom');
+
+    if (garmentColorSelect && garmentColorCustom) {
+      const syncGarmentColor = () => {
+        const show = garmentColorSelect.value === '__custom__';
+        garmentColorCustom.style.display = show ? 'block' : 'none';
+        if (!show) garmentColorCustom.value = '';
+      };
+      garmentColorSelect.addEventListener('change', syncGarmentColor);
+      syncGarmentColor();
+    }
+
+    document.querySelectorAll('.dynamic-row').forEach(wireDynamicCustom);
+  </script>
 </body>
 </html>
