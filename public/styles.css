@@ -233,10 +233,10 @@ label{
 /* board */
 .board{
   display:flex;
-  gap:20px;
-  padding:0;
-  align-items:flex-start;
+  gap:18px;
   overflow-x:auto;
+  align-items:flex-start;
+  padding-bottom:10px;
 }
 
 .column{
