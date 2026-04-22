@@ -4,12 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Job Detail</title>
-<link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/public/styles.css" />
 </head>
 <body>
   <div class="page">
     <div class="topbar">
-      <h1><%= job.customer_name || 'Job Detail' %></h1>
+      <div class="brand-wrap">
+        <img src="/public/zander-logo.png" alt="Zander Ink Logo" class="brand-logo" onerror="this.style.display='none'">
+        <div>
+          <h1 class="brand-title"><%= job.customer_name || 'Job Detail' %></h1>
+          <p class="brand-subtitle"><%= job.company_name || '' %></p>
+        </div>
+      </div>
       <a class="btn btn-light" href="/">Back to Dashboard</a>
     </div>
 
@@ -26,7 +32,7 @@
 
     <div class="detail-grid">
       <div class="card">
-        <h2>Job Info</h2>
+        <h2 class="panel-title">Job Info</h2>
         <p><strong>Company:</strong> <%= job.company_name || '-' %></p>
         <p><strong>Email:</strong> <%= job.customer_email || '-' %></p>
         <p><strong>Garment:</strong> <%= job.garment || '-' %></p>
@@ -40,17 +46,17 @@
       </div>
 
       <div class="card">
-        <h2>Mockup</h2>
+        <h2 class="panel-title">Mockup</h2>
         <% if (job.mockup) { %>
           <img src="<%= job.mockup %>" class="mockup-image" alt="Mockup">
         <% } else { %>
-          <p>No mockup uploaded.</p>
+          <p class="muted">No mockup uploaded.</p>
         <% } %>
       </div>
     </div>
 
     <div class="card">
-      <h2>Actions</h2>
+      <h2 class="panel-title">Actions</h2>
       <form method="POST" action="/jobs/<%= job.id %>/send-approval">
         <button type="submit" class="btn btn-primary">Send / Resend Approval</button>
       </form>
