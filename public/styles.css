@@ -528,3 +528,37 @@ textarea{
   border:1px solid #ccc;
   resize:vertical;
 }
+.button-row{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+}
+
+.big-btn{
+  flex:1;
+  padding:16px;
+  font-size:18px;
+  font-weight:700;
+  border-radius:12px;
+  cursor:pointer;
+  border:none;
+}
+
+/* Green */
+.btn-green{
+  background:#22c55e;
+  color:#fff;
+}
+
+/* Red */
+.btn-red{
+  background:#ef4444;
+  color:#fff;
+}
+
+/* Mobile stacking */
+@media (max-width:600px){
+  .button-row{
+    flex-direction:column;
+  }
+}
