@@ -26,7 +26,7 @@
         <h3><%= column %></h3>
 
         <% jobs
-          .filter(j => (j.status || 'Pending Approval') === column || (!j.status && column === 'Pending Approval'))
+          .filter(j => j.status === column)
           .forEach(job => { %>
          <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status || 'Pending Approval' %>">
   <% if (job.mockup) { %>
