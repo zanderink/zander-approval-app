@@ -28,7 +28,7 @@
         <% jobs
           .filter(j => (j.status || 'Pending Approval') === column || (!j.status && column === 'Pending Approval'))
           .forEach(job => { %>
-           <div class="board-card" draggable="true" data-id="<%= job.id %>">
+         <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status || 'Pending Approval' %>">
   <% if (job.mockup) { %>
     <img src="<%= job.mockup %>" alt="Mockup" class="job-thumb">
   <% } else { %>
