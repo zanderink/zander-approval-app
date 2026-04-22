@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Edit Job</title>
+  <title>Edit Approval Job</title>
   <link rel="stylesheet" href="/public/styles.css" />
 </head>
 <body>
   <div class="page">
     <div class="topbar">
       <div>
-        <h1 class="brand-title">Edit Job</h1>
-        <p class="brand-subtitle">Update details, replace the mockup, and resend approval.</p>
+        <h1 class="brand-title">Edit Approval Job</h1>
+        <p class="brand-subtitle">Update details, replace mockup, and resend approval.</p>
       </div>
       <a class="btn btn-light" href="/jobs/<%= job.id %>">Back to Job</a>
     </div>
@@ -41,7 +41,15 @@
 
         <div>
           <label>Garment</label>
-          <input name="garment" value="<%= job.garment || '' %>" />
+          <select name="garment">
+            <option value="">Select garment</option>
+            <option <%= job.garment === 'Shirt' ? 'selected' : '' %>>Shirt</option>
+            <option <%= job.garment === 'Long Sleeve' ? 'selected' : '' %>>Long Sleeve</option>
+            <option <%= job.garment === 'Hoodie' ? 'selected' : '' %>>Hoodie</option>
+            <option <%= job.garment === 'Jacket' ? 'selected' : '' %>>Jacket</option>
+            <option <%= job.garment === 'Polo' ? 'selected' : '' %>>Polo</option>
+            <option <%= job.garment === '1/4 Zip' ? 'selected' : '' %>>1/4 Zip</option>
+          </select>
         </div>
 
         <div>
@@ -51,7 +59,12 @@
 
         <div>
           <label>Process</label>
-          <input name="process" value="<%= job.process || '' %>" />
+          <select name="process">
+            <option value="">Select process</option>
+            <option <%= job.process === 'Screen Print' ? 'selected' : '' %>>Screen Print</option>
+            <option <%= job.process === 'Embroidery' ? 'selected' : '' %>>Embroidery</option>
+            <option <%= job.process === 'Direct to Film' ? 'selected' : '' %>>Direct to Film</option>
+          </select>
         </div>
 
         <div>
@@ -60,7 +73,7 @@
         </div>
 
         <div class="full">
-          <label>Imprint Colors</label>
+          <label>Color of Imprint(s)</label>
           <input name="imprint_colors" value="<%= job.imprint_colors || '' %>" />
         </div>
 
