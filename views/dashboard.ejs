@@ -28,11 +28,31 @@
         <% jobs
           .filter(j => (j.status || 'Pending Approval') === column || (!j.status && column === 'Pending Approval'))
           .forEach(job => { %>
-            <div class="card board-card" draggable="true" data-id="<%= job.id %>">
-              <strong><%= job.customer_name || 'No customer' %></strong><br>
-              <%= job.garment || '' %><br>
-              <a href="/jobs/<%= job.id %>">Open</a>
-            </div>
+           <div class="board-card" draggable="true" data-id="<%= job.id %>">
+  <% if (job.mockup) { %>
+    <img src="<%= job.mockup %>" alt="Mockup" class="job-thumb">
+  <% } else { %>
+    <div class="job-thumb job-thumb-placeholder">No Preview</div>
+  <% } %>
+
+  <div class="job-card-body">
+    <div class="job-card-top">
+      <div class="job-name"><%= job.customer_name || 'No customer' %></div>
+      <div class="job-badge <%= (job.approval_status || 'waiting').toLowerCase().replace(/\s+/g,'-') %>">
+        <%= job.approval_status || 'Waiting' %>
+      </div>
+    </div>
+
+    <div class="job-meta"><%= job.company_name || '' %></div>
+    <div class="job-meta"><%= job.garment || '' %></div>
+    <div class="job-meta"><%= job.garment_color || '' %></div>
+
+    <div class="job-bottom">
+      <div class="job-price"><%= job.total_price || '' %></div>
+      <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
+    </div>
+  </div>
+</div> 
         <% }) %>
       </div>
     <% }) %>
