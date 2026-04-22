@@ -253,8 +253,9 @@ const transporter = nodemailer.createTransport({
 /* =========================
    AUTH ROUTES
 ========================= */
-app.get('/login', (req, res) => {
-  res.render('login');
+app.get('/', requireLogin, async (req, res) => {
+  const jobs = await getAllJobsDB();
+  res.render('dashboard', { jobs });
 });
 
 app.post('/login', (req, res) => {
