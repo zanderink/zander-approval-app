@@ -28,8 +28,18 @@
         <h3><%= column %></h3>
 
         <% jobs
-          .filter(job => (job.status || '').trim() === column.trim())
-          .forEach(job => { %>
+          <% jobs
+  .filter(job => {
+    const status = (job.status || '').trim();
+    const approval = (job.approval_status || '').trim().toUpperCase();
+
+    if (column === 'Pending Approval') return status === 'Pending Approval' || approval === 'WAITING';
+    if (column === 'Approved') return status === 'Approved' || approval === 'APPROVED';
+    if (column === 'Changes Requested') return status === 'Changes Requested' || approval === 'REQUEST CHANGES';
+
+    return status === column;
+  })
+  .forEach(job => { %>
 
           <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status %>">
             <% if (job.mockup) { %>
