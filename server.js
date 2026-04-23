@@ -464,8 +464,11 @@ app.post('/approve/:id', async (req, res) => {
   res.render('approval-result', { job: updatedJob });
 });
 app.post('/jobs/:id/delete', requireLogin, async (req, res) => {
+  console.log('DELETE ROUTE HIT FOR ID:', req.params.id);
+
   try {
     await pool.query('DELETE FROM jobs WHERE id = $1', [req.params.id]);
+    console.log('DELETE OK FOR ID:', req.params.id);
     res.redirect('/');
   } catch (err) {
     console.error('DELETE ERROR:', err);
