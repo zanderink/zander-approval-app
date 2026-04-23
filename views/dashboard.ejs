@@ -28,7 +28,6 @@
         <h3><%= column %></h3>
 
         <% jobs
-          <% jobs
   .filter(job => {
     const status = (job.status || '').trim();
     const approval = (job.approval_status || '').trim().toUpperCase();
