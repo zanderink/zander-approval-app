@@ -463,7 +463,7 @@ app.post('/approve/:id', async (req, res) => {
 
   res.render('approval-result', { job: updatedJob });
 });
-app.post('/jobs/:id/delete', async (req, res) => {
+app.post('/jobs/:id/delete', requireLogin, async (req, res) => {
   try {
     await pool.query('DELETE FROM jobs WHERE id = $1', [req.params.id]);
     res.redirect('/');
