@@ -62,8 +62,12 @@
               <div class="job-price"><%= job.total_price || '' %></div>
 
               <div class="job-bottom">
-                <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
-              </div>
+  <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
+
+  <form action="/jobs/<%= job.id %>/delete" method="POST" style="margin-top:8px;">
+    <button type="submit" class="delete-btn" onclick="return confirm('Delete this job?')">Delete</button>
+  </form>
+</div>
             </div>
 
           <% }) %>
