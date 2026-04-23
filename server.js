@@ -463,7 +463,15 @@ app.post('/approve/:id', async (req, res) => {
 
   res.render('approval-result', { job: updatedJob });
 });
-
+app.post('/jobs/:id/delete', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM jobs WHERE id = $1', [req.params.id]);
+    res.redirect('/');
+  } catch (err) {
+    console.error('DELETE ERROR:', err);
+    res.status(500).send('Failed to delete job');
+  }
+});
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
 });
