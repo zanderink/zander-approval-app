@@ -8,131 +8,68 @@
 </head>
 <body>
   <div class="page">
-  <h1>Zander Ink Dashboard</h1>
-  <div class="top-links">
-    <a href="/jobs/new">+ Create New Job</a>
-    <a href="/logout">Log Out</a>
-  </div>
+    <h1>Zander Ink Dashboard</h1>
 
-  <% const columns = [
-    'Pending Approval',
-    'Changes Requested',
-    'Approved',
-    'In Production',
-    'Completed'
-  ]; %>
+    <div class="top-links">
+      <a href="/jobs/new">+ Create New Job</a>
+      <a href="/logout">Log Out</a>
+    </div>
 
-  <div class="board">
-    <% columns.forEach(column => { %>
-      <div class="column" data-status="<%= column %>">
-        <h3><%= column %></h3>
+    <% const columns = [
+      'Pending Approval',
+      'Changes Requested',
+      'Approved',
+      'In Production',
+      'Completed'
+    ]; %>
 
-        <% jobs
-  .filter(job => {
-    const status = (job.status || '').trim();
-    const approval = (job.approval_status || '').trim().toUpperCase();
+    <div class="board">
+      <% columns.forEach(function(column) { %>
+        <div class="column" data-status="<%= column %>">
+          <h3><%= column %></h3>
 
-    if (column === 'Pending Approval') return status === 'Pending Approval' || approval === 'WAITING';
-    if (column === 'Approved') return status === 'Approved' || approval === 'APPROVED';
-    if (column === 'Changes Requested') return status === 'Changes Requested' || approval === 'REQUEST CHANGES';
+          <% jobs
+            .filter(function(job) {
+              const status = (job.status || '').trim();
+              const approval = (job.approval_status || '').trim().toUpperCase();
 
-    return status === column;
-  })
-  .forEach(job => { %>
+              if (column === 'Pending Approval') return status === 'Pending Approval' || approval === 'WAITING';
+              if (column === 'Approved') return status === 'Approved' || approval === 'APPROVED';
+              if (column === 'Changes Requested') return status === 'Changes Requested' || approval === 'REQUEST CHANGES';
 
-          <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status %>">
-            <% if (job.mockup) { %>
-              <img
-                src="<%= job.mockup %>"
-                alt="Mockup"
-                class="job-thumb preview-img"
-              />
-            <% } else { %>
-              <div class="job-thumb job-thumb-placeholder">No Preview</div>
-            <% } %>
+              return status === column;
+            })
+            .forEach(function(job) { %>
 
-            <div class="badge"><%= job.process || 'Print' %></div>
+            <div class="board-card" draggable="true" data-id="<%= job.id %>" data-status="<%= job.status %>">
+              <% if (job.mockup) { %>
+                <img
+                  src="<%= job.mockup %>"
+                  alt="Mockup"
+                  class="job-thumb"
+                />
+              <% } else { %>
+                <div class="job-thumb job-thumb-placeholder">No Preview</div>
+              <% } %>
 
-            <div class="job-card-top">
+              <div class="badge"><%= job.process || 'Print' %></div>
               <div class="job-name"><%= job.customer_name || 'No customer' %></div>
-              <div class="job-badge <%= (job.approval_status || 'waiting').toLowerCase().replace(/\s+/g, '-') %>">
-                <%= job.approval_status || 'Waiting' %>
+              <div class="job-meta"><%= job.company_name || '' %></div>
+              <div class="job-meta"><%= job.approval_status || 'Waiting' %></div>
+              <div class="job-meta">Due: <%= job.due_date || '-' %></div>
+              <div class="job-meta">PO: <%= job.po_number || '-' %></div>
+              <div class="job-meta">Rush: <%= job.rush_order || 'No' %></div>
+              <div class="job-price"><%= job.total_price || '' %></div>
+
+              <div class="job-bottom">
+                <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
               </div>
             </div>
 
-            <div class="job-meta"><%= job.company_name || '' %></div>
-            <div class="job-meta"><strong><%= job.process || '' %></strong></div>
-            <div class="job-meta"><%= job.garment_color || '' %></div>
-            <div class="job-meta">Due: <%= job.due_date || '-' %></div>
-            <div class="job-meta">PO: <%= job.po_number || '-' %></div>
-            <div class="job-meta">Rush: <%= job.rush_order || 'No' %></div>
-            <div class="job-meta"><%= job.fulfillment || '' %></div>
-
-            <% if (job.fulfillment === 'Ship' && job.shipping_address) { %>
-              <div class="job-meta">Ship: Yes</div>
-            <% } %>
-
-            <div class="job-bottom">
-              <div class="job-price"><%= job.total_price || '' %></div>
-              <a href="/jobs/<%= job.id %>" class="open-btn">Open Job</a>
-<form action="/jobs/<%= job.id %>/delete" method="POST" style="margin-top:6px;">
-  <button type="submit" class="delete-btn">Delete</button>
-</form>
-            </div>
-          </div>
-
-        <% }) %>
-      </div>
-    <% }) %>
+          <% }) %>
+        </div>
+      <% }) %>
+    </div>
   </div>
-
-  <script>
-    let draggedCard = null;
-
-    document.querySelectorAll('.board-card').forEach(card => {
-      card.addEventListener('dragstart', () => {
-        draggedCard = card;
-        card.classList.add('dragging');
-      });
-
-      card.addEventListener('dragend', () => {
-        card.classList.remove('dragging');
-        draggedCard = null;
-      });
-    });
-
-    document.querySelectorAll('.column').forEach(column => {
-      column.addEventListener('dragover', e => {
-        e.preventDefault();
-      });
-
-      column.addEventListener('drop', async e => {
-        e.preventDefault();
-        if (!draggedCard) return;
-
-        column.appendChild(draggedCard);
-
-        const jobId = draggedCard.dataset.id;
-        const status = column.dataset.status;
-
-        try {
-          const res = await fetch(`/jobs/${jobId}/move`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status })
-          });
-
-          if (!res.ok) {
-            alert('Move failed');
-            window.location.reload();
-          }
-        } catch (err) {
-          alert('Move failed');
-          window.location.reload();
-        }
-      });
-    });
-</script>
-</div>
 </body>
 </html>
